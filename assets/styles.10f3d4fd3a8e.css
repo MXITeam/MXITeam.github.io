@@ -17,6 +17,7 @@ img,canvas { display:block; }
 .brand img { object-fit:contain; }
 .brand>span { font-size:28px; letter-spacing:-.055em; font-weight:750; }
 .brand>.brand-separator { font-size:18px; font-weight:400; letter-spacing:0; color:#c5ccd6; }
+.brand>.brand-research { font-size:13px; font-weight:400; letter-spacing:.035em; color:#b9c2cf; }
 .header-github { font-size:12px; padding:12px 0 12px 20px; color:#bcc7d8; }
 .header-github span { margin-left:17px; color:#edf3ff; }
 .hero { position:relative; height:calc(100svh - 84px); min-height:0; isolation:isolate; }
