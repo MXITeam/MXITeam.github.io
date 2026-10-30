@@ -55,7 +55,7 @@ window.MXIMathDetail = (() => {
       // Face and shell features are much finer than the shortened particle
       // field. Reinforce only source-image ridges in that area; no solid image
       // fill is added and the existing edge envelope still controls the crop.
-      float face=u_robot*smoothstep(.36,.50,v_uv.x)*(1.-smoothstep(.86,.98,v_uv.x))
+      float face=u_robot*smoothstep(.27,.40,v_uv.x)*(1.-smoothstep(.86,.98,v_uv.x))
         *smoothstep(.10,.20,v_uv.y)*(1.-smoothstep(.62,.72,v_uv.y));
       float faceRidge=(pow(ridge,.7)*.55+smoothstep(.05,.2,ridge)*.10
         +pow(darkRidge,.8)*.22)
@@ -64,7 +64,7 @@ window.MXIMathDetail = (() => {
       // shading distinguishable at phone size. The underlying source already
       // carries the irregular crop envelope, and this layer is revealed only
       // after the binary particles have formed.
-      float faceTone=pow(light,1.5)*.38;
+      float faceTone=pow(light,1.5)*.85;
       alpha+=face*(faceRidge+faceTone)*u_opacity;
       // Retain the folds of the brain at small sizes, without brightening the
       // sparse neural branches on the right or drawing the source rectangle.
