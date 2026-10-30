@@ -333,7 +333,10 @@
   function resize(){
     if(lost)return;
     const bounds=stage.getBoundingClientRect(),w=Math.round(bounds.width),h=Math.round(bounds.height);
-    const nextDpr=Math.min(window.devicePixelRatio||1,w<700?3:2);
+    // Supersample narrow low-density screens so fine contours survive the
+    // browser's reduction to CSS size without multiplying wide-screen cost.
+    const deviceDpr=window.devicePixelRatio||1;
+    const nextDpr=w<700?Math.max(2,Math.min(deviceDpr,3)):Math.min(deviceDpr,2);
     if(!w||!h||(w===width&&h===height&&nextDpr===dpr))return;
     // Phones have dense displays but a small subject: allow 3x backing pixels there.
     width=w;height=h;dpr=nextDpr;size=width<700?Math.min(width*.47,height*.32):Math.min(width*.36,height*.4);
