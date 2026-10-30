@@ -38,6 +38,7 @@ window.MXIMathDetail = (() => {
       float y=(texture2D(u_source,v_uv+vec2(0.,u_texel.y)).r+texture2D(u_source,v_uv-vec2(0.,u_texel.y)).r)*.5;
       // Preserve thin bright ridges without laying a grey picture over the scene.
       float ridge=max(0.,light-min(x,y));
+      float darkRidge=max(0.,max(x,y)-light);
       float breath=.035+.43*smoothstep(-.35,.9,sin(u_time*.9+v_uv.y*6.+v_uv.x*3.));
       float body=(pow(light,1.15)*.30+pow(ridge,.65)*.78)*breath;
       // Preserve the actual fine neuronal branches at display resolution. This
@@ -51,7 +52,8 @@ window.MXIMathDetail = (() => {
       // fill is added and the existing edge envelope still controls the crop.
       float face=u_robot*smoothstep(.36,.50,v_uv.x)*(1.-smoothstep(.86,.98,v_uv.x))
         *smoothstep(.10,.20,v_uv.y)*(1.-smoothstep(.62,.72,v_uv.y));
-      float faceRidge=(pow(ridge,.7)*.55+smoothstep(.05,.2,ridge)*.10)
+      float faceRidge=(pow(ridge,.7)*.55+smoothstep(.05,.2,ridge)*.10
+        +pow(darkRidge,.8)*.22)
         *(.18+.17*smoothstep(-.4,.8,sin(u_time*.65+v_uv.y*4.)));
       alpha+=face*faceRidge*u_opacity;
       gl_FragColor=vec4(.94,.97,1.,alpha);
