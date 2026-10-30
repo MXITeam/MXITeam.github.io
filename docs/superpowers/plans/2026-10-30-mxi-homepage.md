@@ -1,17 +1,16 @@
 # MXI Homepage Implementation Plan
 
-**Goal:** A single-screen, English-only MXI binary sculpture, published at https://mxiteam.github.io/.
+**Goal:** A minimal binary-particle MXI → robot → brain → Earth loop, published at https://mxiteam.github.io/.
 
-**Architecture:** Static HTML/CSS with separate shader and animation-controller files. Fixed-volume masking, local geometry, and no external runtime dependencies.
+**Architecture:** Static HTML/CSS, deterministic shape targets, shaders, and animation controller. Local content-hashed assets; no package dependencies.
 
 **Spec:** `docs/superpowers/specs/2026-10-30-mxi-homepage-design.md`
 
-- [x] Keep only the hero, logo/GitHub header, brand meaning, and exact English introduction.
-- [x] Remove secondary sections, navigation, mode controls/status, and extra top labels.
-- [x] Keep letters stationary with a fixed oblique camera, front/back/side layers, and inverse per-depth masking.
-- [x] Add internal binary flow, graph connections, waves, cursor vortices, pulse input, and echoes.
-- [x] Preserve pause/resume, reduced motion, fallback, and visibility suspension.
-- [x] Fit narrow, laptop, and short landscape viewport layouts.
-- [x] Run source checks, mocked runtime verification, static audit, and independent source review.
-- [x] Apply explicit owner authorization to make only this homepage repository public and enable Pages.
-- [ ] Push the final revision and verify its public Pages deployment and served files.
+- [x] Keep only the logo/GitHub header, particle sculpture, and brand caption.
+- [x] Remove extra sections, labels, explanations, visible instructions, and all animation buttons.
+- [x] Generate recognizable robot, brain, and globe geometry and a continuous 32-second morph cycle.
+- [x] Keep the camera fixed and MXI stationary during its hold, retaining volume and depth layers.
+- [x] Preserve keyboard input, reduced motion, fallback, and visibility suspension.
+- [x] Verify target geometry, ordered loop weights, runtime lifecycle, source syntax, and static scope.
+- [x] Apply owner authorization to publish only this homepage repository through Pages.
+- [ ] Push and verify the final deployed HTML and all content-hashed production assets.

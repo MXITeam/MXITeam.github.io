@@ -1,11 +1,11 @@
 # MXI homepage design
 
-The brand is **MXI: Mathematics x Intelligence**, using the owner's supplied GitHub avatar. Build a single-screen English-only homepage on black with bright silver-white **0 and 1 glyphs** forming MXI. Show the brand meaning and the exact line: “Exploring intelligence that perceives, reasons, predicts, and acts.”
+The brand is **MXI: Mathematics x Intelligence**, using the owner's supplied GitHub avatar. Keep a minimal English-only, black homepage containing only the logo/GitHub header, particle sculpture, and **Mathematics x Intelligence** caption.
 
-Keep the MXI letters stationary. Restore depth through front, back, and side layers viewed by a fixed oblique camera. Use inverse projection at each layer's depth to clip the moving glyphs to the fixed letter shape. Rich motion belongs inside the letters: digit streams, fine graph connections, local cursor vortices, traveling waves, subtle echoes, and click/tap/Enter-triggered pulses.
+Use luminous silver-white **0 and 1 glyphs**. The same particle batch automatically morphs in the order **MXI → robot → brain → Earth → MXI**, looping continuously. Hold each form for five seconds and morph over three seconds. Use recognizable 3D target geometry, cerebral folds and a brainstem, and a stylized globe with continents. Maintain a fixed camera and stationary MXI while it is held; restore volume through multiple depth layers.
 
-Remove About, Research, projects, secondary navigation, footer sections, and their code. Do not display “MATHEMATICS IN MOTION”, “PERCEIVE / REASON / PREDICT / ACT”, Flow/Network/Wave controls, or a mode-status label. Keep a minimal logo/GitHub header, direct interaction guidance, and an accessible pause control.
+Remove About, Research, projects, secondary navigation, footer sections, all extra top labels, the introduction sentence, visible interaction guidance, mode labels/status, and all animation buttons. Direct pointer/click interaction may remain. Provide keyboard-only Enter pulses and Space pause/resume with screen-reader instructions, reduced motion, and a readable graphics fallback.
 
-Use plain HTML, CSS, JavaScript, WebGL, and local assets. No external fonts, scripts, backend, or dependencies. Support narrow and short viewports, keyboard input, reduced motion, hidden-tab/offscreen suspension, and a readable graphics fallback. Do not modify existing test files.
+Use plain HTML, CSS, JavaScript, WebGL, and local assets, with content-hashed production URLs. No external dependencies, models, fonts, scripts, or textures. Support narrow/short viewports, offscreen and hidden-tab rendering suspension, and safe context-loss handling. Do not modify existing test files.
 
-The owner explicitly authorized making **only MXITeam/MXITeam.github.io** public and deploying to **https://mxiteam.github.io/**. Serve `main` from `/` with GitHub Pages. Verify the native deployment and publicly served files separately from source/runtime checks and visual browser acceptance.
+The owner authorized making **only MXITeam/MXITeam.github.io** public and publishing at **https://mxiteam.github.io/** through GitHub Pages from `main` and `/`. Verify the native build and publicly served asset bytes separately from source/runtime checks and browser visual acceptance.

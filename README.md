@@ -1,43 +1,40 @@
 # MXI: Mathematics x Intelligence
 
-A single-screen, English-only homepage: **https://mxiteam.github.io/**.
+**https://mxiteam.github.io/**
 
-The page contains the supplied GitHub avatar, a stationary volumetric MXI sculpture built from luminous binary digits, the brand meaning, and:
+A minimal English homepage on black. A single batch of luminous binary digits smoothly cycles through **MXI → robot → brain → Earth → MXI**. Each form holds for five seconds, then morphs for three seconds, completing a 32-second loop. The camera remains fixed, with depth from front, back, and side geometry.
 
-> Exploring intelligence that perceives, reasons, predicts, and acts.
+The visible page contains only the supplied logo, GitHub link, particle scene, and **Mathematics x Intelligence** caption. There are no extra sections, labels, explanatory sentences, mode controls, or animation buttons.
 
-There are no About, Research, project, or secondary navigation sections.
-
-## Animation
-
-The camera is fixed. Front, back, and side layers provide depth while a per-depth letter mask keeps the MXI silhouette stable. Only the internal 0/1 field moves. It blends streaming digits, fine connections, and traveling waves without mode buttons.
-
-Move the cursor to bend a local field; click or tap to launch an energy wave. Focus the sculpture and press Enter or Space for the same action. Pause/resume is keyboard accessible. Animation suspends in hidden tabs, offscreen, and for reduced-motion preferences. A readable MXI heading remains when graphics are unavailable.
-
-The stylesheet filename includes its content hash so a new deployment cannot reuse an older cached stylesheet. All assets, shaders, binary glyphs, and geometry are local. No dependencies, external fonts, analytics, or build step are required.
+Pointer and click interaction remains local to the field. Keyboard users can focus the scene, press Enter for a pulse, and Space to pause/resume. Reduced motion shows static MXI. Rendering suspends offscreen and in hidden tabs; a readable heading remains if graphics are unavailable.
 
 ## Source
 
-- `index.html`: the single-screen composition and metadata.
-- `styles.*.css`: black-and-silver responsive design and short-height layout.
-- `particle-shaders.js`: procedural binary glyphs, fixed oblique projection and inverse masks, local fields, pulses, and lighting.
-- `particles.js`: geometry, graph connections, input, animation lifecycle, and WebGL rendering.
-- `assets/mxi-logo.png`: the avatar supplied by the owner.
+- `index.html`: minimal composition and metadata.
+- `styles.css`: responsive black layout.
+- `particle-shapes.js`: deterministic 3D targets, stylized continents, and cyclic morph weights.
+- `particle-shaders.js`: binary glyphs, fixed camera, interpolation, masking, and lighting.
+- `particles.js`: geometry, interaction, animation lifecycle, and WebGL rendering.
+- `assets/`: supplied avatar and versioned production assets.
+
+No external models, fonts, scripts, textures, or package installation are required. Asset filenames carry content hashes to avoid stale GitHub Pages caches.
 
 ## Preview and publish
 
+After changing an asset, refresh its versioned production file:
+
 ```sh
+python3 scripts/version-assets.py
 python3 -m http.server 8768 --bind 127.0.0.1
 ```
 
-Open <http://127.0.0.1:8768/> and refresh after source changes.
-
-The owner authorized making this homepage repository public and deploying with GitHub Pages. Pages serves the root of `main` at <https://mxiteam.github.io/>. `.nojekyll` avoids unnecessary processing. Push verified changes to `main` to update the site.
+Open <http://127.0.0.1:8768/>. Verified changes pushed to `main` deploy through GitHub Pages from the repository root. The owner explicitly authorized making this homepage repository public.
 
 ```sh
 node --check particles.js
 node --check particle-shaders.js
+node --check particle-shapes.js
 git diff --check
 ```
 
-See `docs/verification.md` for verification evidence and limits.
+Verification evidence and limitations are recorded in `docs/verification.md`.

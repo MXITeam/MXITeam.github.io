@@ -3,8 +3,7 @@
 (() => {
   const stage = document.querySelector("#particle-stage");
   const canvas = document.querySelector("#mxi-particles");
-  const motionToggle = document.querySelector("#motion-toggle");
-  if (!stage || !canvas || !motionToggle || !window.MXIParticleShaders) return;
+  if (!stage || !canvas || !window.MXIShapes || !window.MXIParticleShaders) return;
   const gl = canvas.getContext("webgl", { alpha: false, antialias: false, powerPreference: "low-power" });
   if (!gl) return;
   const mask = document.createElement("canvas");
@@ -44,11 +43,16 @@
   const position = gl.getAttribLocation(program, "a_position");
   const traits = gl.getAttribLocation(program, "a_traits");
   gl.enableVertexAttribArray(position);
-  gl.vertexAttribPointer(position, 3, gl.FLOAT, false, 28, 0);
+  gl.vertexAttribPointer(position, 3, gl.FLOAT, false, 76, 0);
   gl.enableVertexAttribArray(traits);
-  gl.vertexAttribPointer(traits, 4, gl.FLOAT, false, 28, 12);
+  gl.vertexAttribPointer(traits, 4, gl.FLOAT, false, 76, 12);
+  ["a_robot", "a_brain", "a_earth"].forEach((name, index) => {
+    const location = gl.getAttribLocation(program, name);
+    gl.enableVertexAttribArray(location);
+    gl.vertexAttribPointer(location, 4, gl.FLOAT, false, 76, 28 + index * 16);
+  });
   const uniforms = Object.fromEntries([
-    "resolution", "dpr", "time", "echo", "glowPass", "mode", "bounds", "pointer", "pointerActive", "pointerEnergy", "linePass", "lineOpacity", "wordMask"
+    "resolution", "dpr", "time", "echo", "glowPass", "mode", "shapes", "pointer", "pointerActive", "pointerEnergy", "linePass", "lineOpacity", "wordMask"
   ].map(name => [name, gl.getUniformLocation(program, "u_" + name)]));
   uniforms.pulses = gl.getUniformLocation(program, "u_pulses[0]");
   gl.activeTexture(gl.TEXTURE0);
@@ -87,6 +91,9 @@
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.uniform1f(uniforms.time, reduceMotion.matches ? 3 : elapsed);
     gl.uniform3fv(uniforms.mode, modes);
+    const shapeTime = reduceMotion.matches ? 3 : elapsed;
+    const shapes = window.MXIShapes.weights(shapeTime);
+    gl.uniform4fv(uniforms.shapes, shapes);
     gl.uniform2f(uniforms.pointer, pointer.x, pointer.y);
     gl.uniform1f(uniforms.pointerActive, paused || reduceMotion.matches ? 0 : pointer.active);
     gl.uniform1f(uniforms.pointerEnergy, pointer.energy);
@@ -94,17 +101,19 @@
     gl.uniform1f(uniforms.echo, 0);
     gl.uniform1f(uniforms.glowPass, 0);
     gl.uniform1f(uniforms.linePass, 1);
-    gl.uniform1f(uniforms.lineOpacity, .018 + modes[1] * .16 + modes[2] * .025);
+    gl.uniform1f(uniforms.lineOpacity, (.018 + modes[1] * .16 + modes[2] * .025) * shapes[0]);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, edgeBuffer);
     gl.drawElements(gl.LINES, edgeCount, gl.UNSIGNED_SHORT, 0);
     gl.uniform1f(uniforms.linePass, 0);
     if (!reduceMotion.matches) {
       [.18, .08].forEach(delay => {
         gl.uniform1f(uniforms.echo, delay);
+        gl.uniform4fv(uniforms.shapes, window.MXIShapes.weights(Math.max(0, shapeTime - delay)));
         gl.drawArrays(gl.POINTS, 0, count);
       });
     }
     gl.uniform1f(uniforms.echo, 0);
+    gl.uniform4fv(uniforms.shapes, shapes);
     gl.uniform1f(uniforms.glowPass, 1);
     gl.drawArrays(gl.POINTS, 0, count);
     gl.uniform1f(uniforms.glowPass, 0);
@@ -144,7 +153,6 @@
     animationFrame = 0;
     lastClock = 0;
     lastFrame = 0;
-    motionToggle.hidden = reduceMotion.matches || contextLost;
     render();
     if (!paused && visible && !document.hidden && !reduceMotion.matches && !contextLost) animationFrame = requestAnimationFrame(animate);
   }
@@ -214,13 +222,13 @@
     const bottom = Math.min(height - 1, baseline + metrics.actualBoundingBoxDescent);
     const left = Math.max(0, (width - metrics.width) / 2);
     const right = Math.min(width - 1, left + metrics.width);
-    gl.uniform2f(uniforms.bounds, height / 2 - bottom, Math.max(1, bottom - top));
     const gap = width < 700 ? 6 : 9;
     const depth = fontSize * .32;
     const pixels = maskContext.getImageData(0, 0, width, height).data;
     const alphaAt = (x, y) => x < 0 || y < 0 || x >= width || y >= height ? 0 : pixels[(Math.floor(y) * width + Math.floor(x)) * 4 + 3];
     const candidates = [];
     for (let y = top; y <= bottom; y += gap) for (let x = left; x <= right; x += gap) {
+      if (alphaAt(x, y) < 160) continue;
       const px = x - width / 2 + (Math.random() - .5) * 1.5;
       const py = height / 2 - y;
       const size = width < 700 ? 8 + Math.random() * 1.5 : 11 + Math.random() * 2;
@@ -237,6 +245,7 @@
     const stride = Math.max(1, candidates.length / limit);
     const geometry = [];
     for (let index = 0; index < candidates.length; index += stride) geometry.push(...candidates[Math.floor(index)]);
+    const letterCount = geometry.length / 7;
     const floorCount = width < 700 ? 180 : 420;
     for (let index = 0; index < floorCount; index++) {
       geometry.push((Math.random() - .5) * width, height / 2 - bottom - 30, (Math.random() - .5) * 480,
@@ -244,7 +253,18 @@
     }
     count = geometry.length / 7;
     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(geometry), gl.STATIC_DRAW);
+    const packed = [];
+    const robotScale = Math.min(width * .29, height * .39);
+    const roundScale = Math.min(width * .29, height * .37);
+    for (let index = 0; index < count; index++) {
+      packed.push(...geometry.slice(index * 7, index * 7 + 7));
+      if (index < letterCount) {
+        packed.push(...window.MXIShapes.robot(index, robotScale),
+          ...window.MXIShapes.brain(index, letterCount, roundScale),
+          ...window.MXIShapes.earth(index, letterCount, roundScale));
+      } else packed.push(0,0,0,0, 0,0,0,0, 0,0,0,0);
+    }
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(packed), gl.STATIC_DRAW);
     const edges = buildEdges(geometry);
     edgeCount = edges.length;
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, edgeBuffer);
@@ -284,13 +304,8 @@
     pointerDown = null;
   });
   stage.addEventListener("keydown", event => {
-    if (event.key === "Enter" || event.key === " ") { event.preventDefault(); sendPulse(); }
-  });
-  motionToggle.addEventListener("click", () => {
-    paused = !paused;
-    motionToggle.querySelector(".motion-label").textContent = paused ? "Resume animation" : "Pause animation";
-    motionToggle.querySelector(".motion-icon").textContent = paused ? "▷" : "Ⅱ";
-    syncAnimation();
+    if (event.key === "Enter") { event.preventDefault(); sendPulse(); }
+    if (event.key === " ") { event.preventDefault(); paused = !paused; syncAnimation(); }
   });
   document.addEventListener("visibilitychange", () => { pointer.targetActive = 0; syncAnimation(); });
   reduceMotion.addEventListener("change", syncAnimation);
@@ -299,7 +314,6 @@
     contextLost = true;
     cancelAnimationFrame(animationFrame);
     stage.classList.remove("is-ready");
-    motionToggle.hidden = true;
   });
   if ("ResizeObserver" in window) {
     new ResizeObserver(() => { cancelAnimationFrame(resizeFrame); resizeFrame = requestAnimationFrame(resize); }).observe(stage);

@@ -2,21 +2,24 @@
 
 Date: 2026-10-30.
 
-## Current revision
+## Current composition
 
-Single-screen English-only homepage. The wordmark is **MXI**, expanded as **Mathematics x Intelligence**, without a trailing dot. The supplied avatar is local. About, Research, project and footer sections, secondary navigation, mode controls/status, and extra top labels are removed.
+Minimal English homepage containing the supplied logo, GitHub link, a bright 0/1 sculpture, and **Mathematics x Intelligence**. There are no extra sections, top labels, explanatory sentences, visible interaction guidance, mode controls, or animation buttons.
 
-The volumetric binary letters use a constant oblique camera and fixed per-depth masks. Front, back, and side layers restore depth; only the internal 0/1 field moves. Direct interaction provides local vortices and click/tap/Enter pulses. Streaming, connections, waves, echoes, and glow blend internally without mode buttons.
+The sculpture cycles **MXI → robot → brain → Earth → MXI**. Each shape holds for five seconds and morphs for three seconds. A fixed oblique camera retains volume and keeps the held MXI stationary. The brain has folds and a brainstem; the globe uses stylized continental outlines. No external geometry or texture is downloaded.
 
-## Completed source and runtime checks
+## Checks
 
-- Both JavaScript files pass Node syntax checks; Git whitespace checks pass.
-- A local mock-browser/WebGL harness verifies automatic time advancement, normalized field blending, click and Enter pulses, pause/resume, hidden-tab and offscreen suspension, reduced-motion static rendering, and graphics-context-loss fallback.
-- Static HTML checks cover the single-screen scope, exact English copy, local asset references, internal anchors, and removed labels/navigation.
-- Independent source review checked the fixed camera inverse and texture orientation, shader interfaces, and interaction lifecycle. The unsafe GLSL negative-base square was replaced by multiplication; viewport sizing uses remaining height and a short-height rule.
+- All three JavaScript sources pass syntax checks; Git whitespace checks pass.
+- Deterministic target checks verify finite coordinates and opacity, correct shape order, normalized interpolation weights, and a continuous 32-second loop.
+- Mock-browser/WebGL checks verify packed 19-float attributes, automatic time advancement, click/Enter pulses, Space pause/resume, visibility suspension, reduced-motion static MXI, and context-loss fallback.
+- A local CPU projection of the actual target geometry was visually inspected for recognizable robot, brain, and globe forms. This is a geometry preview, not evidence of actual WebGL rendering.
+- Independent source review checked attribute stride/offsets, shader precision, cyclic weights, and reduced motion. Production asset filenames include hashes to avoid stale Pages caches.
 
-The harness does not establish real GPU shader compilation, frame rate, visual quality, or binary-glyph legibility. Native browser acceptance could not be completed: the browser access host became unavailable, and screenshots were blank. GPU visual and mobile-browser checks remain unverified.
+## Limits
+
+Browser access became unavailable and native screenshots were blank, so final GPU rendering, frame rate, morph appearance, and mobile-browser layout remain unverified. Source checks and CPU previews do not establish those results.
 
 ## Publication
 
-The owner authorized publishing this homepage repository and making it public. GitHub API confirms Pages uses `main` and `/`, with HTTPS enforced, at **https://mxiteam.github.io/**. The final pushed revision's build and served asset checks are verified separately at delivery. Other repository visibility settings are outside this change.
+The owner authorized making this homepage repository public and deploying to **https://mxiteam.github.io/**. Pages uses `main` and `/`, with HTTPS enforced. Final public HTML and asset readback are verified independently at delivery.

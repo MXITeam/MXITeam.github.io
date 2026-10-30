@@ -5,13 +5,16 @@ window.MXIParticleShaders = Object.freeze({
     precision highp float;
     attribute vec3 a_position;
     attribute vec4 a_traits;
+    attribute vec4 a_robot;
+    attribute vec4 a_brain;
+    attribute vec4 a_earth;
     uniform mediump vec2 u_resolution;
     uniform mediump float u_dpr;
     uniform float u_time;
     uniform float u_echo;
     uniform mediump float u_glowPass;
     uniform vec3 u_mode;
-    uniform vec2 u_bounds;
+    uniform vec4 u_shapes;
     uniform vec2 u_pointer;
     uniform float u_pointerActive;
     uniform float u_pointerEnergy;
@@ -21,18 +24,18 @@ window.MXIParticleShaders = Object.freeze({
     varying mediump float v_digit;
     varying mediump float v_isLetter;
     varying mediump float v_depth;
+    varying mediump float v_mxiWeight;
     void main() {
       float t = max(0.0, u_time - u_echo);
       float phase = a_traits.y;
       vec3 p = a_position;
       if (a_traits.w > 0.5) {
-        float direction = mix(-1.0, 1.0, step(0.5, fract(phase * 3.17)));
-        float streamY = u_bounds.x + mod(p.y - u_bounds.x + t * (15.0 + phase * 3.5) * direction, u_bounds.y);
-        vec3 stream = vec3(p.x + sin(t * 0.7 + phase) * 2.0, streamY, p.z);
+        vec3 stream = vec3(p.x + sin(t * 0.9 + phase) * 1.6, p.y + cos(t * 0.8 + phase) * 1.6, p.z);
         vec3 network = vec3(p.x + sin(t * 0.6 + phase) * 0.6, p.y + cos(t * 0.6 + phase) * 0.6, p.z);
         float wave = sin(p.x * 0.028 - t * 1.5 + phase * 0.1);
-        vec3 waves = vec3(p.x + wave * 4.0, p.y + wave * 11.0, p.z);
-        p = stream * u_mode.x + network * u_mode.y + waves * u_mode.z;
+        vec3 waves = vec3(p.x + wave * 1.8, p.y + wave * 2.2, p.z);
+        vec3 letters = stream * u_mode.x + network * u_mode.y + waves * u_mode.z;
+        p = letters * u_shapes.x + a_robot.xyz * u_shapes.y + a_brain.xyz * u_shapes.z + a_earth.xyz * u_shapes.w;
       } else {
         p.y += sin(p.x * 0.017 + t * 0.8) * 2.5;
       }
@@ -69,13 +72,15 @@ window.MXIParticleShaders = Object.freeze({
       gl_PointSize = clamp(a_traits.x * u_dpr * mix(1.0, 2.2, u_glowPass), 6.0, 52.0);
       float echoOpacity = u_echo > 0.0 ? 0.11 * exp(-u_echo * 4.0) : 1.0;
       float reveal = smoothstep(0.0, 1.4, t + phase * 0.04);
-      v_alpha = a_traits.z * shimmer * echoOpacity * reveal;
+      float objectAlpha = dot(u_shapes, vec4(a_traits.z, a_robot.w, a_brain.w, a_earth.w));
+      v_alpha = mix(a_traits.z, objectAlpha, a_traits.w) * shimmer * echoOpacity * reveal;
       float scanDistance = (sin(t * 0.32) * u_resolution.x * 0.42 - screen.x) / 65.0;
       float scan = exp(-scanDistance * scanDistance);
       v_light = 0.9 + scan * 0.16 + influence * 0.16 + pulseLight;
       v_digit = step(0.5, fract(phase * 0.23 + floor(t * 0.5 + phase) * 0.618));
       v_isLetter = a_traits.w;
       v_depth = p.z;
+      v_mxiWeight = u_shapes.x;
     }
   `,
   fragmentSource: `
@@ -91,6 +96,7 @@ window.MXIParticleShaders = Object.freeze({
     varying mediump float v_digit;
     varying mediump float v_isLetter;
     varying mediump float v_depth;
+    varying mediump float v_mxiWeight;
     float segmentDistance(vec2 point, vec2 start, vec2 end) {
       vec2 direction = end - start;
       float fraction = clamp(dot(point - start, direction) / dot(direction, direction), 0.0, 1.0);
@@ -108,9 +114,11 @@ window.MXIParticleShaders = Object.freeze({
       float localY = (screen.y - sx * sy * localX + sx * cy * v_depth) / cx;
       vec2 uv = vec2((localX + u_resolution.x * 0.5) / u_resolution.x, (u_resolution.y * 0.5 - localY) / u_resolution.y);
       float coverage = texture2D(u_wordMask, uv).a;
-      if (v_isLetter > 0.5 && coverage < 0.4) discard;
+      float maskWeight = smoothstep(0.96, 1.0, v_mxiWeight);
+      float edgeAlpha = v_isLetter > 0.5 ? mix(1.0, coverage, maskWeight) : 1.0;
+      if (edgeAlpha < 0.01) discard;
       if (u_linePass > 0.5) {
-        gl_FragColor = vec4(vec3(0.71, 0.82, 1.0), v_alpha * u_lineOpacity);
+        gl_FragColor = vec4(vec3(0.71, 0.82, 1.0), v_alpha * u_lineOpacity * edgeAlpha);
         return;
       }
       vec2 point = (gl_PointCoord - vec2(0.5)) * vec2(2.0, -2.0);
@@ -122,7 +130,7 @@ window.MXIParticleShaders = Object.freeze({
       );
       float glyph = 1.0 - smoothstep(0.055, 0.13, mix(zeroDistance, oneDistance, v_digit));
       float halo = exp(-dot(point, point) * 4.0) * 0.065;
-      float alpha = mix(glyph * 1.3, halo, u_glowPass) * v_alpha;
+      float alpha = mix(glyph * 1.3, halo, u_glowPass) * v_alpha * edgeAlpha;
       if (alpha < 0.008) discard;
       gl_FragColor = vec4(vec3(0.95, 0.98, 1.0) * v_light, alpha);
     }
