@@ -90,6 +90,10 @@ window.MXIStoryShaders=Object.freeze({
       float bodyAlpha=clamp(mix(a_from.w,a_to.w,k)*flicker*a_traits.z*depthLight*1.35,0.,1.);
       float streamAlpha=.32*(1.-smoothstep(.18,.5,abs(strandOffset)));
       v_alpha=mix(bodyAlpha,streamAlpha,stream);
+      // Reduce actual stream samples, not just screen-cell brightness: otherwise
+      // overlapping points fill every cell and form an opaque strip.
+      float streamKeep=smoothstep(.72,.86,fract(seed*32.3));
+      v_alpha*=mix(1.,streamKeep,stream);
       // Ribbon coordinates wrap outside the viewport. While a particle is
       // travelling to or from that ribbon, interpolation can bring the wrap
       // back onscreen; fade it at the seam to prevent a visible cross-screen jump.
