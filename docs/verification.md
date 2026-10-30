@@ -4,22 +4,23 @@ Date: 2026-10-30.
 
 ## Current composition
 
-Minimal English homepage containing the supplied logo, GitHub link, a bright 0/1 sculpture, and **Mathematics x Intelligence**. There are no extra sections, top labels, explanatory sentences, visible interaction guidance, mode controls, or animation buttons.
+A pure-black, full-width binary particle sequence: **1011 → Mathematics → Mechanics → Robot → Brain → Universe → MXI**. Seven ten-second scenes loop continuously. The opening uses upper/lower split-flap digit animation without card surfaces or frames; the central bold 1011 stays fixed. Seven English selectors below the animation jump directly to their scenes and indicate the current one. The final MXI retains the original sans-serif font, readable 7–8.5px binary glyphs, and a fixed oblique view.
 
-The sculpture cycles **MXI → robot → brain → Earth → MXI**. Each shape holds for five seconds and morphs for three seconds. A fixed oblique camera retains volume and keeps the held MXI stationary. The reference-driven robot is an anatomical android profile, the brain uses a lateral anatomical outline with dedicated neural connections, and the globe centers on Asia/Pacific with stylized coasts and a particle halo. The primary targets are sampled from a local, original reference-guided sculpture sheet with shallow luminance depth; procedural geometry is a fallback. No third-party geometry or texture is fetched at runtime.
+The exact owner-uploaded reference is `assets/story-reference.cc5b93713b1e.png` (2191 × 718). All five silhouettes are sampled from that file with soft edges and curved front/back depth. Particle neighborhoods travel through a continuous conduit rather than random scattering. The shader applies real perspective to the resulting XYZ coordinates. Procedural volumes provide a loading-failure fallback.
 
 ## Checks
 
-- All three JavaScript sources pass syntax checks; Git whitespace checks pass.
-- Deterministic target checks verify finite coordinates and opacity, correct shape order, normalized interpolation weights, and a continuous 32-second loop. Actual generated-image pixels were decoded and tested through the reference sampler; all three panels produce bounded finite targets and camera reprojection preserves their silhouettes.
-- Mock-browser/WebGL checks cover a full loop with all four held targets, packed 19-float attributes, brain-network index-buffer bounds, automatic time advancement, click/Enter pulses, Space pause/resume, visibility suspension, reduced-motion static MXI, and context-loss fallback.
-- A local CPU projection of the actual target geometry was visually inspected for recognizable robot, brain, and globe forms. This is a geometry preview, not evidence of actual WebGL rendering.
-- Independent source review checked attribute stride/offsets, shader precision, cyclic weights, and reduced motion. Production asset filenames include hashes to avoid stale Pages caches.
+- All production JavaScript sources pass syntax and Git whitespace checks.
+- A one-off runtime diagnostic exercises a complete 70-second loop, all seven held targets, finite geometry, continuous target joins, pause/resume, hidden/offscreen suspension, reduced motion during an active pulse, static selected scene, and WebGL-context fallback.
+- The exact supplied PNG was decoded independently. All five reference panels produced 10,000 finite bounded targets each, with measured front-to-back spans of approximately 0.98–1.34 normalized units.
+- The original MXI grid diagnostic reproduced the old lattice coherence at approximately 1.0. Full-cell two-axis jitter and unbiased selection reduced measured coherence below 0.04. The final wordmask similarly uses two-axis jitter and shuffled sampling, with a maximum of 12,000 visible glyphs.
+- Native Google Chrome for Testing screenshots confirmed the borderless opening chain and highlighted central 1011, full-width composition, and the reference-derived robot. Clicking Robot visibly switched to that source silhouette and highlighted its selector. Native inspection of the final flip refinement and Universe label is included in the final delivery pass.
+- Independent source review covered seven buffers/targets, shader precision and projection consistency, scene transitions and lifecycle. Two found issues were corrected: negative pulse radius on reduced-motion changes, and discontinuous brain brightness at act boundaries.
 
 ## Limits
 
-A later native browser screenshot confirmed a running binary globe and the minimal desktop composition in release 578c845. A local native GPU screenshot also confirmed the image-sampled Asia-Pacific globe and restored sans-serif MXI, with the earlier medium binary size. The latest further size increase and mobile layout have not completed native visual acceptance. Frame rate was not measured. Source checks and CPU previews do not establish those results.
+The scene shapes are reference-derived three-dimensional reliefs; they are not complete recovered meshes suitable for arbitrary camera angles. Native mobile performance and frame rate have not been measured. Geometry/lifecycle diagnostics alone do not establish visual quality or user acceptance.
 
 ## Publication
 
-The owner authorized making this homepage repository public and deploying to **https://mxiteam.github.io/**. Pages uses `main` and `/`, with HTTPS enforced. Final public HTML and asset readback are verified independently at delivery.
+The owner authorized this homepage repository to be public at **https://mxiteam.github.io/**. Pages serves `main` at `/` with HTTPS. Production URLs use content hashes. Final delivery verifies both the built commit and served HTML/assets.

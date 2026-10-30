@@ -4,7 +4,9 @@
   const stage = document.querySelector("#particle-stage");
   const canvas = document.querySelector("#mxi-particles");
   if (!stage || !canvas || !window.MXIShapes || !window.MXIParticleShaders) return;
-  const referenceActive = Boolean(window.MXIReference && await window.MXIReference.ready);
+  const wordmarkOnly = Boolean(stage.hasAttribute?.("data-wordmark-only"));
+  const referenceActive = Boolean(!wordmarkOnly && window.MXIReference && await window.MXIReference.ready);
+  const shapeWeights = time => wordmarkOnly ? [1, 0, 0, 0] : window.MXIShapes.weights(time);
   const gl = canvas.getContext("webgl", { alpha: false, antialias: false, powerPreference: "low-power" });
   if (!gl) return;
   const mask = document.createElement("canvas");
@@ -92,9 +94,9 @@
     if (contextLost) return;
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.uniform1f(uniforms.time, reduceMotion.matches ? 3 : elapsed);
-    gl.uniform3fv(uniforms.mode, modes);
+    gl.uniform3fv(uniforms.mode, wordmarkOnly ? [0, 1, 0] : modes);
     const shapeTime = reduceMotion.matches ? 3 : elapsed;
-    const shapes = window.MXIShapes.weights(shapeTime);
+    const shapes = shapeWeights(shapeTime);
     gl.uniform4fv(uniforms.shapes, shapes);
     gl.uniform2f(uniforms.pointer, pointer.x, pointer.y);
     gl.uniform1f(uniforms.pointerActive, paused || reduceMotion.matches ? 0 : pointer.active);
@@ -114,7 +116,7 @@
     if (!reduceMotion.matches && shapes.some(value => value > .001 && value < .999)) {
       [.08].forEach(delay => {
         gl.uniform1f(uniforms.echo, delay);
-        gl.uniform4fv(uniforms.shapes, window.MXIShapes.weights(Math.max(0, shapeTime - delay)));
+        gl.uniform4fv(uniforms.shapes, shapeWeights(Math.max(0, shapeTime - delay)));
         gl.drawArrays(gl.POINTS, 0, count);
       });
     }
@@ -262,22 +264,37 @@
     const candidates = [];
     for (let y = top; y <= bottom; y += gap) for (let x = left; x <= right; x += gap) {
       if (alphaAt(x, y) < 160) continue;
-      const px = x - width / 2 + (Math.random() - .5) * 1.5;
-      const py = height / 2 - y;
+      // Jitter both axes across the entire cell. Aligned front/back rows and
+      // regular downsampling otherwise beat against the large binary glyphs.
+      const sampleCell = () => {
+        const sx = x + (Math.random() - .5) * gap;
+        const sy = y + (Math.random() - .5) * gap;
+        return alphaAt(sx, sy) >= 160 ? [sx - width / 2, height / 2 - sy] : [x - width / 2, height / 2 - y];
+      };
+      const [px, py] = sampleCell();
+      const [backX, backY] = sampleCell();
       const size = 7.0 + Math.random() * 1.5;
       candidates.push([px, py, depth / 2, size, Math.random() * Math.PI * 2, .78 + Math.random() * .22, 1]);
-      candidates.push([px, py, -depth / 2, size * .8, Math.random() * Math.PI * 2, .22 + Math.random() * .12, 1]);
+      candidates.push([backX, backY, -depth / 2, size * .8, Math.random() * Math.PI * 2, .22 + Math.random() * .12, 1]);
       const edge = alphaAt(x, y) > 160 && (alphaAt(x - gap, y) < 100 || alphaAt(x + gap, y) < 100 || alphaAt(x, y - gap) < 100 || alphaAt(x, y + gap) < 100);
       if (edge) {
         for (let z = -depth / 2 + gap; z < depth / 2; z += gap * 1.4) {
-          candidates.push([px, py, z, size * .88, Math.random() * Math.PI * 2, .4 + Math.random() * .2, 1]);
+          const [sideX, sideY] = sampleCell();
+          candidates.push([sideX, sideY, z + (Math.random() - .5) * gap * 1.4, size * .88, Math.random() * Math.PI * 2, .4 + Math.random() * .2, 1]);
         }
       }
     }
-    const limit = width < 700 ? 6000 : 12000;
-    const stride = Math.max(1, candidates.length / limit);
+    const limit = wordmarkOnly ? Math.max(1400, Math.min(9000, Math.round(fontSize * fontSize * .08))) : width < 700 ? 6000 : 12000;
+    // Partial Fisher-Yates gives every surface sample an equal chance instead
+    // of selecting a periodic stride through the interleaved depth layers.
+    const selectedCount = Math.min(limit, candidates.length);
+    for (let index = 0; index < selectedCount; index++) {
+      const other = index + Math.floor(Math.random() * (candidates.length - index));
+      [candidates[index], candidates[other]] = [candidates[other], candidates[index]];
+    }
+    const selected = candidates.slice(0, selectedCount).sort((a, b) => b[1] - a[1] || a[0] - b[0]);
     const geometry = [];
-    for (let index = 0; index < candidates.length; index += stride) geometry.push(...candidates[Math.floor(index)]);
+    selected.forEach(point => geometry.push(...point));
     const letterCount = geometry.length / 7;
     const floorCount = 0;
     for (let index = 0; index < floorCount; index++) {
@@ -291,7 +308,7 @@
     const roundScale = Math.min(width * .29, height * .37);
     for (let index = 0; index < count; index++) {
       packed.push(...geometry.slice(index * 7, index * 7 + 7));
-      if (index < letterCount) {
+      if (index < letterCount && !wordmarkOnly) {
         if (referenceActive) {
           packed.push(...window.MXIReference.sample("robot", index, letterCount, width * .74, height * .88),
             ...window.MXIReference.sample("brain", index, letterCount, width * .78, height * .84),
@@ -306,7 +323,7 @@
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(packed), gl.STATIC_DRAW);
     const edges = buildEdges(geometry);
     edgeCount = edges.length;
-    const brainEdges = referenceActive ? new Uint16Array() : buildBrainEdges(packed);
+    const brainEdges = wordmarkOnly || referenceActive ? new Uint16Array() : buildBrainEdges(packed);
     brainEdgeCount = brainEdges.length;
     const combinedEdges = new Uint16Array(edgeCount + brainEdgeCount);
     combinedEdges.set(edges);

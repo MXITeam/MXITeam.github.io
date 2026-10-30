@@ -13,13 +13,13 @@
   <meta property="og:url" content="https://mxiteam.github.io/">
   <meta property="og:image" content="https://mxiteam.github.io/assets/mxi-logo.png">
   <meta name="twitter:card" content="summary">
-  <link rel="preload" as="image" href="./assets/sculpture-reference.ff7bd67ab934.png">
   <link rel="icon" href="./assets/mxi-logo.png" type="image/png">
-  <link rel="stylesheet" href="./assets/styles.ec5ab656b9bd.css">
-  <script src="./assets/particle-shapes.e9df976a8fe0.js" defer></script>
-  <script src="./assets/particle-reference.bae9df17f2dd.js" defer></script>
-  <script src="./assets/particle-shaders.2eb676839cf5.js" defer></script>
-  <script src="./assets/particles.fea20a0cd765.js" defer></script>
+  <link rel="stylesheet" href="./assets/styles.6fdd2d1f0ee0.css">
+  <script src="./assets/story-shapes.3491faf72fb8.js" defer></script>
+  <script src="./assets/story-geometry.65441200ec09.js" defer></script>
+  <script src="./assets/story-targets.fe6bcfe968dc.js" defer></script>
+  <script src="./assets/story-shaders.ee61b6a4b307.js" defer></script>
+  <script src="./assets/story.c9584d09e2a0.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to main content</a>
@@ -33,15 +33,23 @@
     </div>
   </header>
   <main id="main" class="hero container">
-    <div class="particle-stage" id="particle-stage" role="group" tabindex="0" aria-label="Interactive binary MXI sculpture" aria-describedby="field-help">
-      <h1 class="particle-wordmark">MXI</h1>
-      <canvas id="mxi-particles" aria-hidden="true"></canvas>
-      <span class="particle-corner top-left" aria-hidden="true"></span><span class="particle-corner top-right" aria-hidden="true"></span><span class="particle-corner bottom-left" aria-hidden="true"></span><span class="particle-corner bottom-right" aria-hidden="true"></span>
+    <h1 class="sr-only">MXI: Mathematics x Intelligence</h1>
+    <div class="story-stage" id="story-stage" role="group" tabindex="0" aria-label="A continuous three-dimensional binary story: 1011, mathematics, mechanics, life, mind, universe, and MXI" aria-describedby="field-help">
+      <div class="story-fallback" aria-hidden="true">MXI</div>
+      <canvas id="story-particles" aria-hidden="true"></canvas>
+      <canvas id="story-conduit" aria-hidden="true"></canvas>
     </div>
-    <div class="hero-statement">
-      <p class="hero-tagline">Mathematics x Intelligence</p>
-    </div>
-    <p id="field-help" class="sr-only">Press Enter while the sculpture is focused to send an energy wave. Press Space to pause or resume. The animation cycles through MXI, a robot, a brain, and Earth.</p>
+    <p class="hero-tagline">Mathematics x Intelligence</p>
+    <nav class="scene-navigation" aria-label="Animation scenes">
+      <button type="button" data-scene="0" aria-current="step">1011</button>
+      <button type="button" data-scene="1">Mathematics</button>
+      <button type="button" data-scene="2">Mechanics</button>
+      <button type="button" data-scene="3">Robot</button>
+      <button type="button" data-scene="4">Brain</button>
+      <button type="button" data-scene="5">Universe</button>
+      <button type="button" data-scene="6">MXI</button>
+    </nav>
+    <p id="field-help" class="sr-only">The central 1011 leads a continuous binary chain through mathematics, a mechanical arm, a humanoid robot, a brain, and the universe, finally forming MXI. Choose a scene below to jump to it. Press Enter for a wave, or Space to pause and resume. Reduced motion shows a static scene.</p>
   </main>
 </body>
 </html>

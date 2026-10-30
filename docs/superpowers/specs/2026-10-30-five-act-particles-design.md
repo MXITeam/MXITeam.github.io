@@ -1,0 +1,11 @@
+# MXI and a continuous digital chain
+
+The owner's final brief supersedes the initial split composition. Use one full-width cinematic field on pure black. The opening is a horizontal, borderless 0/1 chain centered in the viewport. Only its central **1011** is bold and bright and stays fixed. Other digits use the upper/lower center-hinged flip behavior from the owner's GIF, with no card background, white frame or dividing line.
+
+The seven-scene cycle is **1011 → Mathematics → Mechanics → Robot → Brain → Universe → MXI**. Each scene has a six-second hold and four-second transition. MXI holds with a fixed oblique view before the loop repeats. The original sans-serif MXI letterform remains. Every scene has an English selector under the animation and the active selector is highlighted. Clicking selects that scene immediately and continues playback unless paused or reduced motion is enabled.
+
+The five central scenes should closely retain the supplied silver contact sheet. The exact uploaded PNG is the local canonical reference. Sample its luminous shapes into a particle relief with curved front/back depth; inverse base-camera projection preserves the intended silhouette. Use subtle parallax and depth lighting. This is a fixed-view reference reconstruction, not a complete watertight mesh or unrestricted camera orbit. Procedural 3D surfaces are a loading-failure fallback.
+
+All emitted marks are silver 0/1 glyphs, except restrained handwritten mathematical annotations. A traveling front moves local neighborhoods onto a persistent digital conduit and delivers them into the next body. Do not add random explosion trajectories. Broader field dust and soft source-edge opacity remove rectangular image framing. A robot-iris camera push connects the robot to the brain, and the digital conduit orbits the event horizon before the final MXI.
+
+Only the logo/header GitHub link, animation, final Mathematics x Intelligence caption, and requested scene selectors are visible. Do not add explanatory copy, research sections or mode/pause controls. Use buildless HTML/CSS, WebGL 1 and a Canvas 2D foreground; all assets are same-origin. Reduced motion shows a static selected scene; hidden/offscreen stages stop continuous rendering. Preserve WebGL-failure fallback and the already-authorized GitHub Pages deployment.

@@ -2,33 +2,27 @@
 
 **https://mxiteam.github.io/**
 
-A minimal English homepage on black. Binary particles cycle through **MXI → robot → brain → Earth → MXI**, holding each form for five seconds and morphing for three seconds. The camera stays fixed. MXI uses the original bold sans-serif letterform.
+A minimal English homepage on pure black. A borderless binary chain opens with a fixed, bold **1011** at its center. Other digits alternate 0/1 using a two-part, center-hinged flip animation. The sequence continues through **Mathematics → Mechanics → Robot → Brain → Universe → MXI**, then loops.
 
-The visible page contains only the supplied logo, GitHub link, particle scene, and **Mathematics x Intelligence** caption. There are no extra sections, explanatory sentences, mode controls, or animation buttons.
+Each of the seven scenes occupies ten seconds: six seconds of readable form and four seconds of transition. A traveling front carries neighboring particles along a persistent digital conduit into the next body. The seven English scene names below the animation are clickable; the current scene is highlighted. The final MXI uses the original bold sans-serif font and a fixed oblique camera. Its 0/1 glyphs stay approximately 7–8.5 CSS pixels.
 
-## Reference-driven forms
+The five detailed forms use the exact silver reference sheet supplied by the owner, stored locally as `assets/story-reference.cc5b93713b1e.png`. Luminance-weighted sampling retains the original mechanical, anatomical and cosmic details. Curved front/back depth, perspective, subtle view changes and depth lighting provide volume. Soft source edges and a full-width field remove rectangular picture framing. These are reference-derived particle reliefs, not complete free-orbit reconstructed meshes. Procedural 3D geometry provides an image-load fallback.
 
-The three detailed targets are sampled from a local, original, reference-guided sculpture sheet. Luminance-weighted sampling retains the android's mechanical details, the brain's folds and neural structure, and the Asia-Pacific globe's coastline. Layered luminance depth preserves the fixed-view silhouette; these are reference-derived point clouds rather than free-orbit polygon models. Procedural targets remain available if the image cannot load.
-
-Binary glyphs are approximately 7–8.5 CSS pixels before depth variation, with a desktop budget of roughly 12,000 particles to keep them readable without excessive overlap. Hover motion reveals extra binary detail. Pointer/click effects remain local to the field.
-
-Keyboard users can focus the scene, press Enter for a pulse, and Space to pause/resume. Reduced motion shows static MXI. Rendering suspends offscreen and in hidden tabs; a readable heading remains if graphics are unavailable.
+Only the supplied logo/header GitHub link, animation, scene selectors, and final Mathematics x Intelligence caption are visible. There are no extra sections or explanatory copy. Mathematical annotations use a handwriting-style local font. No external fonts, models, scripts, or textures are fetched at runtime.
 
 ## Source
 
-- `index.html`: minimal composition and metadata.
-- `styles.css`: original sans-serif branding and responsive layout.
-- `particle-reference.js`: asynchronous local image loading, luminance-weighted targets, and fixed-view depth projection.
-- `particle-shapes.js`: loop timing and procedural fallback targets.
-- `particle-shaders.js`: binary glyphs, camera, interpolation, masking, and lighting.
-- `particles.js`: geometry, interaction, lifecycle, and rendering.
-- `assets/`: supplied avatar, generated sculpture sheet, and hashed production assets.
+- `index.html`, `styles.css`: full-width composition, navigation, metadata and responsive layout.
+- `story-shapes.js`: seven-scene timing and persistent digital conduit.
+- `story-targets.js`: exact reference sampling, curved depth, soft edges and camera reconstruction.
+- `story-geometry.js`: procedural fallback volumes and the final MXI particle mask.
+- `story-shaders.js`: binary glyphs, depth lighting, perspective and conduit transitions.
+- `story.js`: rendering, flip digits, scene jumping, interaction and lifecycle.
+- `scripts/version-assets.py`: hashed production asset URLs for Pages caching.
 
-No external models, fonts, scripts, textures, or package installation are required at runtime. All assets are served by the site. Asset filenames carry content hashes to avoid stale Pages caches.
+Focus the animation and press Enter for a wave or Space to pause/resume. Scene buttons support keyboard activation. Reduced motion shows a static MXI by default and respects manually selected scenes. Rendering suspends when the tab is hidden or the stage is offscreen. A semantic heading and visual fallback remain if WebGL is unavailable.
 
 ## Preview and publish
-
-After changing a source asset:
 
 ```sh
 python3 scripts/version-assets.py
@@ -38,11 +32,12 @@ python3 -m http.server 8768 --bind 127.0.0.1
 Open <http://127.0.0.1:8768/>. Verified changes pushed to `main` deploy through GitHub Pages from the repository root. The owner authorized making this homepage repository public.
 
 ```sh
-node --check particle-reference.js
-node --check particles.js
-node --check particle-shaders.js
-node --check particle-shapes.js
+node --check story.js
+node --check story-shapes.js
+node --check story-targets.js
+node --check story-geometry.js
+node --check story-shaders.js
 git diff --check
 ```
 
-Verification evidence and limits are recorded in `docs/verification.md`.
+See `docs/verification.md` for acceptance evidence and limits.
