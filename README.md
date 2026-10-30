@@ -1,6 +1,6 @@
 # MXI
 
-MXI's English-only team homepage, built for GitHub Pages with plain HTML, CSS, JavaScript, and WebGL. No dependency installation or build step is required.
+MXI: **Mathematics x Intelligence**. An English-only team homepage, built for GitHub Pages with plain HTML, CSS, JavaScript, and WebGL. No dependency installation or build step is required.
 
 ## Local preview
 
@@ -20,7 +20,7 @@ Open <http://127.0.0.1:8768>. Stop the server with Ctrl+C. Refresh the page afte
 - `particles.js`: locally generated, volumetric silver-white MXI lettering with automatic rotation, flowing particles, scatter/reassembly, cursor interaction, and a pause/resume control.
 - `assets/mxi-logo.png`: the avatar supplied by the site owner, downloaded from the MXITeam GitHub avatar on 2026-10-30.
 
-The brand is **MXI**. All published copy is English. The particle aesthetic follows the owner's reference: dense, silver-white points with visible depth on black. Motion starts automatically; pause/resume is available in the hero. Animation stops offscreen, in hidden tabs, and for a reduced-motion preference. The semantic MXI heading remains readable if WebGL is unavailable. The illustration does not claim a demonstration or measured result.
+The brand is **MXI**, expanded exactly as **Mathematics x Intelligence**. The page title, hero tagline, introduction, and footer use this meaning. All published copy is English. The particle aesthetic follows the owner's reference: dense, silver-white points with visible depth on black. Motion starts automatically; pause/resume is available in the hero. Animation stops offscreen, in hidden tabs, and for a reduced-motion preference. The semantic MXI heading remains readable if WebGL is unavailable. The illustration does not claim a demonstration or measured result.
 
 Research descriptions express interests and engineering approaches. The site does not claim benchmark results or list unconfirmed team members. The public project description is based on [EmbodiedAI-Demo-Pipeline's README](https://github.com/MXITeam/EmbodiedAI-Demo-Pipeline#readme). Private organization repositories are not listed.
 
