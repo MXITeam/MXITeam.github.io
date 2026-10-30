@@ -330,13 +330,16 @@
     cancelAnimationFrame(frame);frame=0;lastClock=0;lastPaint=0;render();
     if(!paused&&visible&&!document.hidden&&!reduced.matches&&!lost)frame=requestAnimationFrame(animate);
   }
+  function renderDpr(viewWidth){
+    const deviceDpr=window.devicePixelRatio||1;
+    return viewWidth<700?Math.max(2,Math.min(deviceDpr,3)):Math.min(deviceDpr,2);
+  }
   function resize(){
     if(lost)return;
     const bounds=stage.getBoundingClientRect(),w=Math.round(bounds.width),h=Math.round(bounds.height);
     // Supersample narrow low-density screens so fine contours survive the
     // browser's reduction to CSS size without multiplying wide-screen cost.
-    const deviceDpr=window.devicePixelRatio||1;
-    const nextDpr=w<700?Math.max(2,Math.min(deviceDpr,3)):Math.min(deviceDpr,2);
+    const nextDpr=renderDpr(w);
     if(!w||!h||(w===width&&h===height&&nextDpr===dpr))return;
     // Phones have dense displays but a small subject: allow 3x backing pixels there.
     width=w;height=h;dpr=nextDpr;size=width<700?Math.min(width*.47,height*.32):Math.min(width*.36,height*.4);
@@ -416,7 +419,7 @@
   // event. Check infrequently while visible so paused/reduced-motion previews
   // also refresh instead of retaining a blurry old backing canvas.
   setInterval(()=>{
-    if(!lost&&visible&&!document.hidden&&Math.min(window.devicePixelRatio||1,width<700?3:2)!==dpr){
+    if(!lost&&visible&&!document.hidden&&renderDpr(width)!==dpr){
       watchResolution();scheduleResize();
     }
   },1000);
