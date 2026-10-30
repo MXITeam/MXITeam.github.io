@@ -55,7 +55,16 @@ window.MXIMathDetail = (() => {
       float faceRidge=(pow(ridge,.7)*.55+smoothstep(.05,.2,ridge)*.10
         +pow(darkRidge,.8)*.22)
         *(.18+.17*smoothstep(-.4,.8,sin(u_time*.65+v_uv.y*4.)));
-      alpha+=face*faceRidge*u_opacity;
+      // A restrained tonal underlay keeps the face's cheek, eye and nose
+      // shading distinguishable at phone size. The underlying source already
+      // carries the irregular crop envelope, and this layer is revealed only
+      // after the binary particles have formed.
+      float faceTone=pow(light,1.5)*.38;
+      alpha+=face*(faceRidge+faceTone)*u_opacity;
+      // Retain the folds of the brain at small sizes, without brightening the
+      // sparse neural branches on the right or drawing the source rectangle.
+      float cortex=u_neural*(1.-smoothstep(.38,.55,v_uv.x));
+      alpha+=cortex*pow(light,1.5)*.25*u_opacity;
       gl_FragColor=vec4(.94,.97,1.,alpha);
     }
   `;
