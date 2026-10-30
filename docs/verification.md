@@ -23,3 +23,5 @@ The source-level/runtime checks above are distinct from a successful public GitH
 ## Publication check
 
 The source was pushed to `MXITeam/MXITeam.github.io` on `main`. Creating a Pages site from `main` and `/` returned HTTP 422: `Your current plan does not support GitHub Pages for this repository.` The organization is on GitHub Free and the repository remains private. Public deployment requires owner authorization to make this homepage repository public, or a supported paid plan.
+
+The owner explicitly selected **keep private, preview locally**. No visibility change or public deployment was performed. The local preview is served at `http://127.0.0.1:8768/`; the served particle script matches the committed source.

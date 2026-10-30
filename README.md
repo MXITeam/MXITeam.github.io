@@ -28,7 +28,7 @@ Research descriptions express interests and engineering approaches. The site doe
 
 The site is ready to publish directly from the root of `main`. In repository **Settings → Pages**, choose **Deploy from a branch**, `main`, `/ (root)`. `.nojekyll` disables unnecessary Jekyll processing. The intended URL is <https://mxiteam.github.io/>.
 
-The repository was private when development began, and the organization uses GitHub Free. GitHub Pages requires a supported paid organization plan for private repositories, or an explicit owner decision to make the repository public. Do not change visibility without owner authorization.
+The owner chose to keep the repository private and use a local preview. GitHub Pages returned HTTP 422 because private organization repositories are not supported on the current GitHub Free plan. No public site was deployed and repository visibility remains unchanged. Do not change visibility without new owner authorization.
 
 For a future custom domain, update the canonical URL, Open Graph URL/image, `robots.txt`, and `sitemap.xml` together.
 

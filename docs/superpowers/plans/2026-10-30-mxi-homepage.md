@@ -26,3 +26,4 @@
 - [x] Add the supplied logo, favicon, metadata, sitemap, robots file, and preview instructions.
 - [x] Validate source and runtime behavior; accurately document the browser verification boundary.
 - [x] Review, commit, push, and check Pages publication without changing visibility. Pages returned HTTP 422 because the repository is private on GitHub Free; visibility changes require owner authorization.
+- [x] Honor the owner's decision to keep the repository private and provide the local preview instead of public deployment.
