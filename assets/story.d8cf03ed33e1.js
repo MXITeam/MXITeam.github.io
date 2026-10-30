@@ -282,7 +282,11 @@
     const volume=sceneLayers?0:(state.from===4||state.from===5?1-state.mix:0)+(state.to===4||state.to===5?state.mix:0);
     view=[(-.34+Math.sin(t*.095)*(.10+volume*.3))*active-.26*endWeight,(.12+Math.sin(t*.07)*(.045+volume*.09))*active+.085*endWeight];
     cosYaw=Math.cos(view[0]);sinYaw=Math.sin(view[0]);cosPitch=Math.cos(view[1]);sinPitch=Math.sin(view[1]);
-    objectSize=size*(1+endWeight*.65+active*.12);
+    // The black hole occupies only the middle of its reference panel. Give it
+    // a little more room on narrow screens, blending the scale during a morph.
+    const universeWeight=(state.from===5?1-state.mix:0)+(state.to===5?state.mix:0);
+    const narrowUniverse=Math.max(0,Math.min(1,(700-width)/380))*universeWeight;
+    objectSize=size*(1+endWeight*.65+active*.12+narrowUniverse*.16);
     const current=state.mix>.5?state.to:state.from;
     sceneButtons.forEach(button=>button.setAttribute("aria-current",Number(button.dataset.scene)===current?"step":"false"));
     // The compass and topology need several times the samples of a solid wordmark.
