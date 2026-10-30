@@ -29,6 +29,7 @@ window.MXIMathDetail = (() => {
     uniform float u_opacity;
     uniform float u_time;
     uniform float u_neural;
+    uniform float u_robot;
     varying mediump vec2 v_uv;
     void main() {
       float light=texture2D(u_source,v_uv).r;
@@ -45,6 +46,14 @@ window.MXIMathDetail = (() => {
       float nerves=(smoothstep(.12,.65,light)*.32+pow(ridge,.60)*.95)*neuralPulse;
       float region=u_neural*smoothstep(.44,.62,v_uv.x);
       float alpha=mix(body,nerves,region)*u_opacity;
+      // Face and shell features are much finer than the shortened particle
+      // field. Reinforce only source-image ridges in that area; no solid image
+      // fill is added and the existing edge envelope still controls the crop.
+      float face=u_robot*smoothstep(.36,.50,v_uv.x)*(1.-smoothstep(.86,.98,v_uv.x))
+        *smoothstep(.10,.20,v_uv.y)*(1.-smoothstep(.62,.72,v_uv.y));
+      float faceRidge=(pow(ridge,.7)*.55+smoothstep(.05,.2,ridge)*.10)
+        *(.18+.17*smoothstep(-.4,.8,sin(u_time*.65+v_uv.y*4.)));
+      alpha+=face*faceRidge*u_opacity;
       gl_FragColor=vec4(.94,.97,1.,alpha);
     }
   `;
@@ -101,7 +110,7 @@ window.MXIMathDetail = (() => {
     gl.texImage2D(gl.TEXTURE_2D,0,gl.LUMINANCE,width,height,0,gl.LUMINANCE,gl.UNSIGNED_BYTE,luminance);
     gl.pixelStorei(gl.UNPACK_ALIGNMENT,4);
     const attributes=[gl.getAttribLocation(program,"a_position"),gl.getAttribLocation(program,"a_uv")];
-    const uniforms=Object.fromEntries(["resolution","view","camera","size","source","texel","opacity","time","neural"].map(name=>[name,gl.getUniformLocation(program,"u_"+name)]));
+    const uniforms=Object.fromEntries(["resolution","view","camera","size","source","texel","opacity","time","neural","robot"].map(name=>[name,gl.getUniformLocation(program,"u_"+name)]));
     return Object.freeze({draw({width,height,view,camera,size,opacity,time=0}){
       if(opacity<.002)return;
       gl.useProgram(program);gl.disable(gl.DEPTH_TEST);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE);
@@ -114,6 +123,7 @@ window.MXIMathDetail = (() => {
       gl.uniform2f(uniforms.texel,1/surface.width,1/surface.height);gl.uniform1f(uniforms.opacity,opacity);
       gl.uniform1f(uniforms.time,time);
       gl.uniform1f(uniforms.neural,surface.act===3?1:0);
+      gl.uniform1f(uniforms.robot,surface.act===2?1:0);
       gl.drawArrays(gl.TRIANGLES,0,vertices.length/5);
       gl.disable(gl.BLEND);
     }});
