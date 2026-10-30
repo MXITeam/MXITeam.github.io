@@ -26,7 +26,7 @@ img,canvas { display:block; }
 .header-github { font-size:12px; padding:12px 0 12px 20px; color:#bcc7d8; }
 .header-github span { color:#edf3ff; }
 .hero { position:relative; height:max(240px,calc(100svh - 84px - 300px)); min-height:0; isolation:isolate; }
-.story-stage { position:absolute; inset:0 calc((100% - 100vw)/2) 80px; width:100vw; touch-action:pan-y; user-select:none; cursor:crosshair; }
+.story-stage { position:absolute; inset:0 calc((100% - 100vw)/2) 70px; width:100vw; touch-action:pan-y; user-select:none; cursor:crosshair; }
 #story-particles,#story-conduit,.story-fallback { position:absolute; inset:0; width:100%; height:100%; }
 #story-conduit { pointer-events:none; }
 .story-fallback { display:grid; place-items:center; font:900 clamp(100px,25vw,380px)/1 "Arial Black",Arial,sans-serif; }
