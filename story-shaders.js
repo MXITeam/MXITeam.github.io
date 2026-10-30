@@ -54,8 +54,8 @@ window.MXIStoryShaders=Object.freeze({
       // A shallow, multi-strand current gives the chain room to breathe.
       // During collection and release, curved paths meet the same moving
       // current tangentially; held silhouettes remain completely stationary.
-      float wave=sin(ribbonX/u_resolution.x*8.-u_time*.6)*min(u_resolution.y*.025,14.);
-      float strand=(fract(seed*2.71)-.5)*min(u_resolution.y*.045,24.);
+      float wave=sin(ribbonX/u_resolution.x*8.-u_time*.6)*min(u_resolution.y*.035,20.);
+      float strand=(fract(seed*2.71)-.5)*min(u_resolution.y*.085,42.);
       vec2 ribbon=vec2(ribbonX,wave+strand);
       float gatherArc=sin(3.14159265*retreat);
       float releaseArc=sin(3.14159265*emerge);
