@@ -69,7 +69,7 @@ window.MXIMathDetail = (() => {
       // Retain the folds of the brain at small sizes, without brightening the
       // sparse neural branches on the right or drawing the source rectangle.
       float cortex=u_neural*(1.-smoothstep(.38,.55,v_uv.x));
-      alpha+=cortex*pow(light,1.5)*.25*u_opacity;
+      alpha+=cortex*pow(light,1.5)*.65*u_opacity;
       // The accretion disk contains fine bright rings. Restore those ridges
       // without filling the dark event horizon or lighting the crop edges.
       float diskPulse=.55+.30*smoothstep(-.5,.8,sin(u_time*.65+v_uv.x*4.-v_uv.y*3.));
