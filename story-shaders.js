@@ -54,10 +54,15 @@ window.MXIStoryShaders=Object.freeze({
       // A shallow, multi-strand current gives the chain room to breathe.
       // During collection and release, curved paths meet the same moving
       // current tangentially; held silhouettes remain completely stationary.
-      float wave=sin(ribbonX/u_resolution.x*8.-u_time*.6)*min(u_resolution.y*.045,28.);
+      float flowX=ribbonX/u_resolution.x;
+      float wave=(sin(flowX*7.-u_time*.6)+.38*sin(flowX*15.+u_time*.38))*min(u_resolution.y*.055,34.);
       float strandOffset=fract(seed*2.71)-.5;
-      float strand=strandOffset*min(u_resolution.y*.24,104.);
-      vec2 ribbon=vec2(ribbonX,wave+strand);
+      // The current widens and narrows along its path. Smaller ripples differ
+      // per strand, so the particles travel as a fluid rather than a flat band.
+      float spread=.75+.25*sin(flowX*5.-u_time*.32);
+      float strand=strandOffset*min(u_resolution.y*.38,150.)*spread;
+      float ripple=sin(flowX*11.-u_time*.85+strandOffset*8.)*min(u_resolution.y*.018,11.);
+      vec2 ribbon=vec2(ribbonX,wave+strand+ripple);
       float gatherArc=sin(3.14159265*retreat);
       float releaseArc=sin(3.14159265*emerge);
       vec2 gathered=mix(fromScreen,ribbon,retreat)+vec2(u_resolution.x*.045,-fromScreen.y*.16)*gatherArc;
