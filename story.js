@@ -342,7 +342,10 @@
     // Preserve detail across a shorter stage: a fixed 3.2px grid used to lose
     // about a third of the subject's samples when Projects entered the viewport.
     // Larger flow glyphs remain independently sized for readable moving 0/1.
-    detailCell=Math.min(3.2,Math.max(2.2,size/84));
+    // At low DPR, sub-four-pixel character cells collapse the strokes into
+    // specks. Keep a minimum in device pixels while preserving the finer grid
+    // on high-density screens.
+    detailCell=Math.max(4/dpr,Math.min(3.2,Math.max(2.2,size/84)));
     const fieldCell=Math.min(detailCell,baseCell);
     fieldWidth=Math.max(1,Math.round(width/fieldCell));fieldHeight=Math.max(1,Math.round(height/fieldCell));
     gl.bindTexture(gl.TEXTURE_2D,fieldTexture);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,fieldWidth,fieldHeight,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
