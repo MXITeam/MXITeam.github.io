@@ -288,8 +288,11 @@
     // The black hole occupies only the middle of its reference panel. Give it
     // a little more room on narrow screens, blending the scale during a morph.
     const universeWeight=(state.from===5?1-state.mix:0)+(state.to===5?state.mix:0);
+    const brainWeight=(state.from===4?1-state.mix:0)+(state.to===4?state.mix:0);
     const narrowUniverse=Math.max(0,Math.min(1,(700-width)/380))*universeWeight;
-    objectSize=size*(1+endWeight*.65+active*.12+narrowUniverse*.16);
+    // The brain occupies only part of its reference field. Give its folds and
+    // neural branches more display pixels while retaining the surrounding fade.
+    objectSize=size*(1+endWeight*.65+active*.12+narrowUniverse*.16+brainWeight*.12);
     const current=state.mix>.5?state.to:state.from;
     sceneButtons.forEach(button=>button.setAttribute("aria-current",Number(button.dataset.scene)===current?"step":"false"));
     // The compass and topology need several times the samples of a solid wordmark.
