@@ -4,7 +4,7 @@ Date: 2026-10-30.
 
 ## Final revision
 
-English-only website; black background; silver-white volumetric particle letters spelling MXI. Automatic motion includes an initial assembly, continuous rotation and surface motion, and a 14-second scatter/reassembly cycle. Pointer input is optional. The local logo is the owner's supplied GitHub avatar.
+English-only website; black background; bright silver-white volumetric particle letters spelling MXI, with a separate additive glow pass. Automatic motion includes an initial assembly, continuous rotation and surface motion, and a 14-second scatter/reassembly cycle. Pointer input is optional. The local logo is the owner's supplied GitHub avatar. MXI wordmarks have no trailing dot.
 
 ## Completed checks
 
@@ -19,3 +19,7 @@ English-only website; black background; silver-white volumetric particle letters
 The final WebGL revision has not completed native browser visual or mobile viewport verification. The computer-use session stopped because its current browser URL was restricted. Real GPU shader compilation, the exact visual appearance, frame rate, and final mobile layout therefore remain unverified. Earlier browser inspection does not establish these checks for the final revision.
 
 The source-level/runtime checks above are distinct from a successful public GitHub Pages deployment. Repository visibility must remain private unless its owner authorizes changing it.
+
+## Publication check
+
+The source was pushed to `MXITeam/MXITeam.github.io` on `main`. Creating a Pages site from `main` and `/` returned HTTP 422: `Your current plan does not support GitHub Pages for this repository.` The organization is on GitHub Free and the repository remains private. Public deployment requires owner authorization to make this homepage repository public, or a supported paid plan.

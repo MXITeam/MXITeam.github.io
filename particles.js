@@ -22,6 +22,7 @@
     uniform float u_pointerActive;
     uniform float u_time;
     uniform float u_dpr;
+    uniform mediump float u_glowPass;
     varying mediump float v_alpha;
     varying mediump float v_light;
     void main() {
@@ -56,22 +57,24 @@
       screen += difference / max(distance, 1.0) * influence * 43.0;
       gl_Position = vec4(screen.x / (u_resolution.x * 0.5), screen.y / (u_resolution.y * 0.5), 0.0, 1.0);
       float sparkle = 0.82 + 0.18 * sin(t * 2.0 + phase * 4.0);
-      gl_PointSize = clamp(a_traits.x * perspective * u_dpr * sparkle, 1.0, 6.0);
+      float glowScale = mix(1.0, 2.8, u_glowPass);
+      gl_PointSize = clamp(a_traits.x * perspective * u_dpr * sparkle * glowScale, 1.5, 14.0);
       v_alpha = a_traits.z * (0.7 + 0.3 * sparkle);
-      v_light = 0.84 + 0.16 * sin(p.x * 0.006 - t * 0.7 + phase);
+      v_light = 0.94 + 0.06 * sin(p.x * 0.006 - t * 0.7 + phase);
     }
   `;
   const fragmentSource = `
     precision mediump float;
     varying mediump float v_alpha;
     varying mediump float v_light;
+    uniform mediump float u_glowPass;
     void main() {
       vec2 offset = gl_PointCoord - vec2(0.5);
       float radius = length(offset) * 2.0;
       if (radius > 1.0) discard;
-      float core = exp(-radius * radius * 3.2);
-      float alpha = core * v_alpha;
-      gl_FragColor = vec4(vec3(0.82, 0.89, 1.0) * v_light, alpha);
+      float core = exp(-radius * radius * mix(2.0, 4.0, u_glowPass));
+      float alpha = core * v_alpha * mix(1.2, 0.10, u_glowPass);
+      gl_FragColor = vec4(vec3(0.95, 0.98, 1.0) * v_light, alpha);
     }
   `;
 
@@ -105,7 +108,7 @@
   gl.vertexAttribPointer(position, 3, gl.FLOAT, false, 28, 0);
   gl.enableVertexAttribArray(traits);
   gl.vertexAttribPointer(traits, 4, gl.FLOAT, false, 28, 12);
-  const uniforms = Object.fromEntries(["resolution", "pointer", "pointerActive", "time", "dpr"].map(name => [name, gl.getUniformLocation(program, "u_" + name)]));
+  const uniforms = Object.fromEntries(["resolution", "pointer", "pointerActive", "time", "dpr", "glowPass"].map(name => [name, gl.getUniformLocation(program, "u_" + name)]));
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
   gl.clearColor(0, 0, 0, 1);
@@ -132,6 +135,9 @@
     gl.uniform1f(uniforms.time, reduceMotion.matches ? 3 : elapsed);
     gl.uniform2f(uniforms.pointer, pointerX, pointerY);
     gl.uniform1f(uniforms.pointerActive, paused || reduceMotion.matches ? 0 : pointerActive);
+    gl.uniform1f(uniforms.glowPass, 1);
+    gl.drawArrays(gl.POINTS, 0, count);
+    gl.uniform1f(uniforms.glowPass, 0);
     gl.drawArrays(gl.POINTS, 0, count);
   }
 
@@ -197,14 +203,14 @@
         if (alphaAt(x, y) < 160) continue;
         const px = x - width / 2 + (Math.random() - .5) * gap;
         const py = height / 2 - y + (Math.random() - .5) * gap;
-        const size = .55 + Math.random() * .95;
-        addPoint(px, py, depth / 2, size, .36 + Math.random() * .48);
-        addPoint(px, py, -depth / 2, size * .8, .16 + Math.random() * .25);
+        const size = .85 + Math.random() * 1.4;
+        addPoint(px, py, depth / 2, size, .65 + Math.random() * .35);
+        addPoint(px, py, -depth / 2, size * .8, .28 + Math.random() * .3);
         const edge = alphaAt(x - gap, y) < 100 || alphaAt(x + gap, y) < 100 || alphaAt(x, y - gap) < 100 || alphaAt(x, y + gap) < 100;
         if (edge) {
-          for (let z = -depth / 2; z < depth / 2; z += gap * 1.6) addPoint(px, py, z, size, .32 + Math.random() * .4);
+          for (let z = -depth / 2; z < depth / 2; z += gap * 1.6) addPoint(px, py, z, size, .5 + Math.random() * .4);
         } else if (Math.random() < .12) {
-          addPoint(px, py, (Math.random() - .5) * depth, size * .75, .16);
+          addPoint(px, py, (Math.random() - .5) * depth, size * .75, .25);
         }
       }
     }

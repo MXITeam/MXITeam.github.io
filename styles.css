@@ -32,7 +32,6 @@ p, h1, h2, h3, figure { margin: 0; }
 .brand { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .brand > span { font-size: 29px; letter-spacing: -.055em; font-weight: 750; }
 .brand img { object-fit: contain; }
-.brand-period { color: var(--green); }
 .main-nav { display: flex; justify-content: center; gap: 32px; margin-left: auto; }
 .main-nav > a { position: relative; color: #a9b0bb; font-size: 12px; font-weight: 500; line-height: 2; transition: color .2s; }
 .main-nav > a::after { position: absolute; content: ""; height: 3px; width: 3px; left: 50%; bottom: -10px; border-radius: 50%; background: var(--green); transform: scale(0); transition: transform .2s; }

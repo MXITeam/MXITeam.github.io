@@ -24,5 +24,5 @@
 - [x] Create `script.js` for mobile navigation and active-section state.
 - [x] Create `particles.js` for three-dimensional geometry, automatic motion, cursor interaction, pause/resume, and visibility handling.
 - [x] Add the supplied logo, favicon, metadata, sitemap, robots file, and preview instructions.
-- [ ] Validate source and runtime behavior; accurately document the browser verification boundary.
-- [ ] Review, commit, push, and check Pages publication without changing visibility.
+- [x] Validate source and runtime behavior; accurately document the browser verification boundary.
+- [x] Review, commit, push, and check Pages publication without changing visibility. Pages returned HTTP 422 because the repository is private on GitHub Free; visibility changes require owner authorization.
