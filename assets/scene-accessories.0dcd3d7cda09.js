@@ -1,7 +1,49 @@
 "use strict";
 
 // Small diagrammatic objects share the sculpture's projection and lifecycle.
-window.MXIStoryAccessories=Object.freeze({
+window.MXIStoryAccessories=(()=>{
+  // Prepare transparent binary sprites from photographic source details. The
+  // source itself is never composited into the page, so no rectangular image
+  // edge or solid photo interrupts the particle field.
+  const sprites={};
+  if(typeof Image!=="undefined"){
+    const source=new Image();
+    source.onload=()=>{
+      try{
+        const crops=[['motor',0,.185],['camera',.185,.365],['capsule',.365,.505],
+          ['flask',.505,.64],['dish',.64,.795],['satellite',.795,1]];
+        const grid=48,renderSize=192;
+        for(const [kind,left,right] of crops){
+          const sample=document.createElement('canvas');sample.width=sample.height=grid;
+          const sc=sample.getContext('2d',{willReadFrequently:true});
+          const sx=source.naturalWidth*left,sw=source.naturalWidth*(right-left);
+          const sy=source.naturalHeight*.15,sh=source.naturalHeight*.63;
+          const fit=Math.min(grid/sw,grid/sh),dw=sw*fit,dh=sh*fit;
+          sc.drawImage(source,sx,sy,sw,sh,(grid-dw)/2,(grid-dh)/2,dw,dh);
+          const data=sc.getImageData(0,0,grid,grid).data;
+          sprites[kind]=Array.from({length:3},(_,frame)=>{
+            const atlas=document.createElement('canvas');atlas.width=atlas.height=renderSize;
+            const ac=atlas.getContext('2d');ac.fillStyle='#e8f1ff';ac.textAlign='center';ac.textBaseline='middle';
+            ac.font='4px monospace';
+            for(let y=0;y<grid;y++)for(let x=0;x<grid;x++){
+              const p=(y*grid+x)*4,light=(data[p]*.2126+data[p+1]*.7152+data[p+2]*.0722)/255;
+              if(light<.075||data[p+3]<20)continue;
+              const edge=Math.min(1,x/3,(grid-1-x)/3,y/3,(grid-1-y)/3);
+              if(edge<=0)continue;
+              const seed=Math.abs(Math.sin((x+1)*12.9898+(y+1)*78.233+frame*31.7)*43758.5453)%1;
+              ac.globalAlpha=Math.min(1,Math.pow(light,.65)*1.2)*edge*(.75+seed*.25);
+              ac.fillText(seed>.48?'1':'0',(x+.5)*4,(y+.5)*4);
+            }
+            return atlas;
+          });
+        }
+        sprites.joint=sprites.motor;
+        window.dispatchEvent(new Event('mxi-accessories-ready'));
+      }catch(error){console.warn('MXI accessory particles:',error);}
+    };
+    source.src='./assets/accessories.aa10dfca6b84.png';
+  }
+  return Object.freeze({
   draw({context:ctx,act,opacity,project,time,width,height,reduced}){
     if(opacity<.01||act<3||act>5)return;
     const unit=Math.max(15,Math.min(width<700?24:36,height*.07));
@@ -28,6 +70,12 @@ window.MXIStoryAccessories=Object.freeze({
       }
       ctx.save();ctx.translate(...center);ctx.rotate(angle);
       const scale=unit/(1-location[2]*.38)*(act===5&&i===1?.78:1);
+      if(sprites[kind]){
+        const frame=reduced?0:Math.floor(time*2.4+i*.7)%sprites[kind].length;
+        ctx.globalAlpha=opacity*.9;
+        ctx.drawImage(sprites[kind][frame],-scale*1.3,-scale*1.3,scale*2.6,scale*2.6);
+        ctx.restore();continue;
+      }
       const path=(points,close=false)=>{ctx.beginPath();points.forEach(([x,y],j)=>{if(j)ctx.lineTo(x*scale,y*scale);else ctx.moveTo(x*scale,y*scale);});if(close)ctx.closePath();ctx.stroke();};
       const ellipse=(x,y,rx,ry)=>{ctx.beginPath();ctx.ellipse(x*scale,y*scale,rx*scale,ry*scale,0,0,Math.PI*2);ctx.stroke();};
       const bolts=(x,y,rx,ry,n=6)=>{for(let j=0;j<n;j++){const a=j/n*Math.PI*2;ellipse(x+rx*Math.cos(a),y+ry*Math.sin(a),.027,.027);}};
@@ -97,4 +145,5 @@ window.MXIStoryAccessories=Object.freeze({
     }
     ctx.restore();
   }
-});
+  });
+})();

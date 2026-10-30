@@ -386,6 +386,7 @@
     time=shapes.sceneTime(act);reducedScene=act;pulses.length=0;pointer.target=0;sync();
   }));
   document.addEventListener("visibilitychange",()=>{pointer.target=0;sync();});
+  window.addEventListener("mxi-accessories-ready",()=>{if(reduced.matches||paused)sync();});
   reduced.addEventListener("change",sync);
   canvas.addEventListener("webglcontextlost",event=>{event.preventDefault();lost=true;cancelAnimationFrame(frame);stage.classList.remove("is-ready");});
   const scheduleResize=()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(resize);};
