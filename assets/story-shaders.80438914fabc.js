@@ -167,7 +167,13 @@ window.MXIStoryShaders=Object.freeze({
       // before the next silhouette settles.
       float current=sin(index.x*.055-u_time*1.05+sin(index.y*.14)*1.4);
       float gap=smoothstep(-.7,.45,current+(seed-.5)*1.2);
-      intensity*=mix(1.,.32+.68*gap,u_stream*.82);
+      // Thin individual cells as well as whole currents: a uniformly filled
+      // grid reads as a flat rectangular strip even with changing brightness.
+      // The threshold moves slowly and continuously, so particles fade rather
+      // than pop, and the full field returns before the next scene settles.
+      float drift=.12*sin(index.x*.027-index.y*.09-u_time*.7);
+      float grain=smoothstep(.28,.67,seed+drift);
+      intensity*=mix(1.,(.13+.87*gap)*(.10+.90*grain),u_stream*.9);
       gl_FragColor=vec4(vec3(.93,.97,1.)*glyph*intensity*twinkle,1.);
     }
   `
