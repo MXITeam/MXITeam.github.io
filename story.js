@@ -180,9 +180,12 @@
       if(shimmer<.02)continue;
       ctx.globalAlpha=.16*(1-intro)*heldFlow*Math.min(1,shimmer);ctx.beginPath();ctx.moveTo(...p);ctx.lineTo(...q);ctx.stroke();
     }
-    ctx.shadowColor="#e3eeff";ctx.shadowBlur=5;
-    for(let i=0;i<66;i++){
-      const u=((i/66+t*.018)%1),index=Math.min(179,Math.floor(u*180)),p=thread[index];
+    // A fixed number of large glyphs overlaps into a bright band on phones.
+    // Spread fewer glyphs along the same path as the viewport narrows.
+    const threadDigits=Math.round(36+30*Math.max(0,Math.min(1,(width-320)/380)));
+    ctx.shadowColor="#e3eeff";ctx.shadowBlur=width<700?3:5;
+    for(let i=0;i<threadDigits;i++){
+      const u=((i/threadDigits+t*.018)%1),index=Math.min(179,Math.floor(u*180)),p=thread[index];
       if(p.hidden)continue;
       const p2=thread[index+1];
       ctx.save();ctx.translate(...p);ctx.rotate(Math.atan2(p2[1]-p[1],p2[0]-p[0]));
