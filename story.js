@@ -331,9 +331,10 @@
   function resize(){
     if(lost)return;
     const bounds=stage.getBoundingClientRect(),w=Math.round(bounds.width),h=Math.round(bounds.height);
-    if(!w||!h||(w===width&&h===height))return;
+    const nextDpr=Math.min(window.devicePixelRatio||1,w<700?3:2);
+    if(!w||!h||(w===width&&h===height&&nextDpr===dpr))return;
     // Phones have dense displays but a small subject: allow 3x backing pixels there.
-    width=w;height=h;dpr=Math.min(window.devicePixelRatio||1,width<700?3:2);size=width<700?Math.min(width*.47,height*.32):Math.min(width*.36,height*.4);
+    width=w;height=h;dpr=nextDpr;size=width<700?Math.min(width*.47,height*.32):Math.min(width*.36,height*.4);
     canvas.width=foreground.width=Math.round(width*dpr);canvas.height=foreground.height=Math.round(height*dpr);
     // Glyph cells follow the subject, so a small screen keeps the same number of
     // 0/1 across the body; 8 device pixels is the smallest legible glyph.
@@ -382,8 +383,19 @@
   document.addEventListener("visibilitychange",()=>{pointer.target=0;sync();});
   reduced.addEventListener("change",sync);
   canvas.addEventListener("webglcontextlost",event=>{event.preventDefault();lost=true;cancelAnimationFrame(frame);stage.classList.remove("is-ready");});
-  if("ResizeObserver"in window)new ResizeObserver(()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(resize);}).observe(stage);
-  else window.addEventListener("resize",resize);
+  const scheduleResize=()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(resize);};
+  if("ResizeObserver"in window)new ResizeObserver(scheduleResize).observe(stage);
+  else window.addEventListener("resize",scheduleResize);
+  // A window can move between displays without changing its CSS dimensions.
+  // Re-arm the query after each change so the backing canvas follows the DPR.
+  let resolutionQuery;
+  function watchResolution(){
+    resolutionQuery?.removeEventListener?.("change",resolutionChanged);
+    resolutionQuery=window.matchMedia(`(resolution: ${window.devicePixelRatio||1}dppx)`);
+    resolutionQuery.addEventListener?.("change",resolutionChanged);
+  }
+  function resolutionChanged(){watchResolution();scheduleResize();}
+  watchResolution();
   if("IntersectionObserver"in window)new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;sync();},{threshold:0}).observe(stage);
   resize();
 })();
