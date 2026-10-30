@@ -195,14 +195,14 @@
     // The wrap happens beyond both viewport edges, never through the sculpture.
     if(state.progress>0){
       const amount=smoothRange(.02,.24,state.progress)*(1-smoothRange(.76,1,state.progress));
-      const run=.6*smoothRange(.40,.60,state.progress),gap=width<700?12:16;
-      const total=Math.max(10,Math.round(width*.4/gap));
+      const run=.6*smoothRange(0,1,state.progress),gap=width<700?12:16;
+      const total=Math.max(10,Math.round(width*1.6/gap));
       ctx.font=`500 ${width<700?11:14}px monospace`;ctx.fillStyle="#edf3ff";
       for(let i=0;i<=total;i++){
-        const lane=i/total,x=width/2+((.20+lane*.40+run+.8)%1.6-.8)*width;
+        const lane=i/total,x=width/2+((lane*1.6+run)%1.6-.8)*width;
         const edge=smoothRange(0,28,Math.min(x,width-x));
         const wave=Math.sin((x-width/2)/width*8-t*.6)*Math.min(height*.045,28);
-        const strand=(hash(i+90)-.5)*Math.min(height*.14,64);
+        const strand=(hash(i+90)-.5)*Math.min(height*.20,84);
         ctx.globalAlpha=amount*edge*(.55+.35*hash(i+40));ctx.fillText(i%3?"0":"1",x,height/2-wave-strand);
       }
     }
