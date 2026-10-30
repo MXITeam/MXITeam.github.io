@@ -51,8 +51,16 @@ window.MXIStoryShaders=Object.freeze({
       float lane=fract(seed*1.913);
       float run=.6*smoothstep(.40,.60,u_progress);
       float ribbonX=(mod(.20+lane*.40+run+.8,1.6)-.8)*u_resolution.x;
-      vec2 ribbon=vec2(ribbonX,0.);
-      vec2 screen=mix(mix(fromScreen,ribbon,retreat),toScreen,emerge);
+      // A shallow, multi-strand current gives the chain room to breathe.
+      // During collection and release, curved paths meet the same moving
+      // current tangentially; held silhouettes remain completely stationary.
+      float wave=sin(ribbonX/u_resolution.x*8.-u_time*.6)*min(u_resolution.y*.025,14.);
+      float strand=(fract(seed*2.71)-.5)*min(u_resolution.y*.045,24.);
+      vec2 ribbon=vec2(ribbonX,wave+strand);
+      float gatherArc=sin(3.14159265*retreat);
+      float releaseArc=sin(3.14159265*emerge);
+      vec2 gathered=mix(fromScreen,ribbon,retreat)+vec2(u_resolution.x*.045,-fromScreen.y*.16)*gatherArc;
+      vec2 screen=mix(gathered,toScreen,emerge)+vec2(u_resolution.x*.045,toScreen.y*.16)*releaseArc;
       float stream=retreat*(1.-emerge),k=emerge;
       vec3 p=mix(mix(from,vec3(0.),retreat),to,emerge);
       float perspective=1./max(.42,1.-p.z*.38);

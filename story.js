@@ -201,7 +201,9 @@
       for(let i=0;i<=total;i++){
         const lane=i/total,x=width/2+((.20+lane*.40+run+.8)%1.6-.8)*width;
         const edge=smoothRange(0,28,Math.min(x,width-x));
-        ctx.globalAlpha=amount*edge*(.55+.35*hash(i+40));ctx.fillText(i%3?"0":"1",x,height/2);
+        const wave=Math.sin((x-width/2)/width*8-t*.6)*Math.min(height*.025,14);
+        const strand=(hash(i+90)-.5)*Math.min(height*.045,24);
+        ctx.globalAlpha=amount*edge*(.55+.35*hash(i+40));ctx.fillText(i%3?"0":"1",x,height/2-wave-strand);
       }
     }
     const mathWeight=(state.from===1?heldFlow:0);
