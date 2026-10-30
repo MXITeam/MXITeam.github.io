@@ -42,7 +42,7 @@
 
 - 品牌：`MXI`；含义：`MXI: Mathematics x Intelligence`。
 - 原 Logo：`assets/mxi-logo.png`，来自团队 GitHub 头像，保留；它与页头 MXI 之间用一个居中点分隔。
-- 页面保留精简页头、整屏主视觉、编号导航，以及最终的 `Mathematics x Intelligence` 字样；右上角为 Research 锚点和 Open Source 外链（链接到团队 GitHub）。
+- 页面保留精简页头、主视觉、编号导航，以及最终的 `Mathematics x Intelligence` 字样；页头与动画区总高度为 `88svh`，给下方内容留出空间。右上角为 Research 锚点和 Open Source 外链（链接到团队 GitHub）。
 - 全站只写英文。与我沟通、交付说明可以使用中文。
 - 背景纯黑，主体由银白色 **0 和 1** 构成。避免彩虹色、大面积彩色背景、发光雾团和过度 bloom。
 - 数学公式等少量文字可以使用手写体，不必全做成粒子。
