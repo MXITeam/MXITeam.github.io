@@ -129,8 +129,14 @@ window.MXIStoryShaders=Object.freeze({
     void main(){
       vec2 screen=gl_FragCoord.xy/u_dpr;
       vec2 cell=screen/u_resolution*u_grid;
+      // A stable, small row offset breaks up vertical grid stripes without
+      // moving the sampled geometry or making the digits jitter over time.
+      float row=floor(cell.y);
+      float stagger=(fract(sin(mod(row,97.)*1.37)*437.1)-.5)*.7;
+      cell.x+=stagger;
       vec2 index=floor(cell);
-      float light=texture2D(u_field,(index+.5)/u_fieldSize).r;
+      vec2 sampleCell=index+vec2(.5-stagger,.5);
+      float light=texture2D(u_field,sampleCell/u_fieldSize).r;
       if(light<.012){gl_FragColor=vec4(0.,0.,0.,1.);return;}
       vec2 p=(fract(cell)-.5)*vec2(1.45,-1.9);
       float seed=fract(sin(dot(mod(index,vec2(32.)),vec2(.37,.61)))*37.17);
