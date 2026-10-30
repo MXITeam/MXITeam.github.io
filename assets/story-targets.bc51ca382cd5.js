@@ -130,7 +130,16 @@ window.MXIStoryReference = (() => {
         const y=(panel.cy-panel.points[low*3+1]+noise(i*3+2)-.5)*panel.scale;
         const neural=act===3?fade((panel.points[low*3]/(panel.width-1)-.44)/.16):0;
         const back=neural<.5&&noise(i+46)>.88;
-        const alpha=(.05*(1-neural)+.008*neural+Math.pow(light,1.3+neural*.35)*.8)*(back?.12:1);
+        let alpha=(.05*(1-neural)+.008*neural+Math.pow(light,1.3+neural*.35)*.8)*(back?.12:1);
+        // Preserve the face's dark recesses and highlights when the source is
+        // reduced to a small screen-space character grid. The feathered mask
+        // leaves the hand, neck and the other scenes' particle density intact.
+        if(act===2){
+          const u=panel.points[low*3]/(panel.width-1),v=panel.points[low*3+1]/(panel.height-1);
+          const face=fade((u-.26)/.12)*fade((.87-u)/.12)*fade((v-.16)/.08)*fade((.62-v)/.08);
+          const contrast=.30+1.2*fade((light-.13)/.55);
+          alpha*=1+face*(contrast-1);
+        }
         data.push([...position(act,x,y,light,back),alpha]);
       }
       return new Float32Array(window.MXIStoryTargets.spatialOrder(data).flat());
