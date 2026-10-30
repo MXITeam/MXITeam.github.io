@@ -61,7 +61,7 @@ img,canvas { display:block; }
  .header-actions a { gap:6px; }
  .header-actions svg { width:14px; height:14px; }
  .header-research { font-size:11px; }
- .hero { height:max(240px,calc(100svh - 70px - 300px)); }
+ .hero { height:max(300px,calc(100svh - 70px - 300px)); }
  .scene-navigation { bottom:22px; }
  .scene-navigation button { font-size:10px; }
  .scene-navigation button[aria-current="step"] { font-size:12px; }
@@ -84,7 +84,7 @@ img,canvas { display:block; }
  .header-inner { height:48px; }
  .brand img { width:27px; height:27px; }
  .brand>span { font-size:22px; }
- .hero { height:max(170px,calc(100svh - 48px - 240px)); }
+ .hero { height:max(230px,calc(100svh - 48px - 240px)); }
  .story-stage { bottom:55px; }
  .scene-navigation { bottom:10px; }
  .research { padding-top:24px; }
