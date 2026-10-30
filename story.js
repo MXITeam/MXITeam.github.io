@@ -394,7 +394,9 @@
   canvas.addEventListener("webglcontextlost",event=>{event.preventDefault();lost=true;cancelAnimationFrame(frame);stage.classList.remove("is-ready");});
   const scheduleResize=()=>{cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(resize);};
   if("ResizeObserver"in window)new ResizeObserver(scheduleResize).observe(stage);
-  else window.addEventListener("resize",scheduleResize);
+  // A viewport or device-scale change can leave the stage's CSS box intact,
+  // so the element observer alone is not enough to refresh the backing pixels.
+  window.addEventListener("resize",scheduleResize);
   // A window can move between displays without changing its CSS dimensions.
   // Re-arm the query after each change so the backing canvas follows the DPR.
   let resolutionQuery;
@@ -405,6 +407,14 @@
   }
   function resolutionChanged(){watchResolution();scheduleResize();}
   watchResolution();
+  // Some device emulators change DPR without firing a resize or media-query
+  // event. Check infrequently while visible so paused/reduced-motion previews
+  // also refresh instead of retaining a blurry old backing canvas.
+  setInterval(()=>{
+    if(!lost&&visible&&!document.hidden&&Math.min(window.devicePixelRatio||1,width<700?3:2)!==dpr){
+      watchResolution();scheduleResize();
+    }
+  },1000);
   if("IntersectionObserver"in window)new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;sync();},{threshold:0}).observe(stage);
   resize();
 })();
