@@ -49,7 +49,7 @@
   gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE);gl.clearColor(0,0,0,1);
   const sceneLayers=referenceReady?window.MXIStoryLayers?.create(gl,reference):null;
   const reduced=window.matchMedia("(prefers-reduced-motion: reduce)");
-  let width=0,height=0,dpr=1,size=1,count=0,frame=0,resizeFrame=0,lastClock=0,lastPaint=0,time=0;
+  let width=0,height=0,dpr=1,size=1,count=0,uploadedCount=0,frame=0,resizeFrame=0,lastClock=0,lastPaint=0,time=0;
   let gridWidth=1,gridHeight=1,fieldWidth=1,fieldHeight=1,baseCell=8.5,detailCell=3.2;
   let paused=false,visible=true,lost=false;
   let reducedScene=6;
@@ -353,13 +353,18 @@
     gl.viewport(0,0,canvas.width,canvas.height);
     // Finer phone cells need enough samples to cover the body without holes.
     count=Math.min(width<700?26000:50000,Math.max(18000,Math.round(width*height/20)));
-    const bodies=referenceReady?targets.bookends(count):targets.build(count);
-    if(referenceReady)reference.build(count,sceneLayers?[0,1,2,3,4]:[0,1,2]).forEach((data,act)=>{if(data)bodies[act+1]=data;});
-    if(!sceneLayers){bodies[4]=brainReady?brain.build(count):targets.buildScene(3,count);bodies[5]=targets.buildScene(4,count);}
-    bodies.forEach((data,act)=>{gl.bindBuffer(gl.ARRAY_BUFFER,buffers[act]);gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW);});
-    const traits=new Float32Array(count*4);
-    for(let i=0;i<count;i++)traits.set([i%19===0?7+hash(i+12)*1.5:2.8+hash(i+8)*.9,hash(i)*Math.PI*2,.7+hash(i+4)*.3,i/count],i*4);
-    gl.bindBuffer(gl.ARRAY_BUFFER,traitBuffer);gl.bufferData(gl.ARRAY_BUFFER,traits,gl.STATIC_DRAW);
+    // Geometry depends on particle count, not viewport pixels or DPR. Keep the
+    // existing GPU buffers when only the backing resolution changes.
+    if(count!==uploadedCount){
+      const bodies=referenceReady?targets.bookends(count):targets.build(count);
+      if(referenceReady)reference.build(count,sceneLayers?[0,1,2,3,4]:[0,1,2]).forEach((data,act)=>{if(data)bodies[act+1]=data;});
+      if(!sceneLayers){bodies[4]=brainReady?brain.build(count):targets.buildScene(3,count);bodies[5]=targets.buildScene(4,count);}
+      bodies.forEach((data,act)=>{gl.bindBuffer(gl.ARRAY_BUFFER,buffers[act]);gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW);});
+      const traits=new Float32Array(count*4);
+      for(let i=0;i<count;i++)traits.set([i%19===0?7+hash(i+12)*1.5:2.8+hash(i+8)*.9,hash(i)*Math.PI*2,.7+hash(i+4)*.3,i/count],i*4);
+      gl.bindBuffer(gl.ARRAY_BUFFER,traitBuffer);gl.bufferData(gl.ARRAY_BUFFER,traits,gl.STATIC_DRAW);
+      uploadedCount=count;
+    }
     stage.classList.add("is-ready");sync();
   }
   stage.addEventListener("pointermove",event=>{
