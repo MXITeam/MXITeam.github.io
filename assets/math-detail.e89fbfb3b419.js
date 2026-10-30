@@ -74,6 +74,11 @@ window.MXIMathDetail = (() => {
       // without filling the dark event horizon or lighting the crop edges.
       float diskPulse=.55+.30*smoothstep(-.5,.8,sin(u_time*.65+v_uv.x*4.-v_uv.y*3.));
       alpha+=u_universe*pow(ridge,.65)*diskPulse*u_opacity;
+      // Restore the accretion disk's luminance locally; the dark horizon and
+      // irregular outer envelope remain untouched by this feathered layer.
+      vec2 disk=(v_uv-vec2(.60,.45))/vec2(.42,.31);
+      float diskRegion=1.-smoothstep(.58,1.,length(disk));
+      alpha+=u_universe*diskRegion*pow(light,1.5)*.65*u_opacity;
       // Retire the reference ridges with the same left-to-right wave as the
       // outgoing particles, instead of fading the whole image at once.
       float withdrawal=1.-smoothstep(v_sourceRank*.22,v_sourceRank*.22+.22,u_progress);
