@@ -202,8 +202,9 @@
         const lane=i/total,x=width/2+((lane*1.6+run)%1.6-.8)*width;
         const edge=smoothRange(0,28,Math.min(x,width-x));
         const wave=Math.sin((x-width/2)/width*8-t*.6)*Math.min(height*.045,28);
-        const strand=(hash(i+90)-.5)*Math.min(height*.20,84);
-        ctx.globalAlpha=amount*edge*(.55+.35*hash(i+40));ctx.fillText(i%3?"0":"1",x,height/2-wave-strand);
+        const offset=hash(i+90)-.5,strand=offset*Math.min(height*.24,104);
+        const feather=1-smoothRange(.18,.5,Math.abs(offset));
+        ctx.globalAlpha=amount*edge*feather*(.55+.35*hash(i+40));ctx.fillText(i%3?"0":"1",x,height/2-wave-strand);
       }
     }
     const mathWeight=(state.from===1?heldFlow:0);

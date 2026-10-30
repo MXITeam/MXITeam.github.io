@@ -55,7 +55,8 @@ window.MXIStoryShaders=Object.freeze({
       // During collection and release, curved paths meet the same moving
       // current tangentially; held silhouettes remain completely stationary.
       float wave=sin(ribbonX/u_resolution.x*8.-u_time*.6)*min(u_resolution.y*.045,28.);
-      float strand=(fract(seed*2.71)-.5)*min(u_resolution.y*.20,84.);
+      float strandOffset=fract(seed*2.71)-.5;
+      float strand=strandOffset*min(u_resolution.y*.24,104.);
       vec2 ribbon=vec2(ribbonX,wave+strand);
       float gatherArc=sin(3.14159265*retreat);
       float releaseArc=sin(3.14159265*emerge);
@@ -82,7 +83,7 @@ window.MXIStoryShaders=Object.freeze({
       float depthLight=mix(.19,1.0,smoothstep(-.6,.45,p.z));
       // Keep tonal range: saturation here flattens every body into a white silhouette.
       float bodyAlpha=clamp(mix(a_from.w,a_to.w,k)*flicker*a_traits.z*depthLight*1.35,0.,1.);
-      float streamAlpha=.32;
+      float streamAlpha=.32*(1.-smoothstep(.18,.5,abs(strandOffset)));
       v_alpha=mix(bodyAlpha,streamAlpha,stream);
       v_digit=step(.5,fract(seed*.27+floor(u_time*.3+seed)*.618));
     }
