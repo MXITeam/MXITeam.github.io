@@ -50,7 +50,7 @@ window.MXIMathDetail = (() => {
       // regional ridge pass is clearer than increasing brightness of all 0/1.
       // Keep fine branches visible between pulses, especially on phone screens.
       float neuralPulse=.28+.38*smoothstep(-.5,.85,sin(u_time*.85+v_uv.y*7.-v_uv.x*4.));
-      float nerves=(smoothstep(.12,.65,light)*.32+pow(ridge,.60)*1.08)*neuralPulse;
+      float nerves=(smoothstep(.12,.65,light)*.40+pow(ridge,.60)*1.35)*neuralPulse;
       float region=u_neural*smoothstep(.44,.62,v_uv.x);
       float alpha=mix(body,nerves,region)*u_opacity;
       // Face and shell features are much finer than the shortened particle
