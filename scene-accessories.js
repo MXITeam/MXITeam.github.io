@@ -56,6 +56,12 @@ window.MXIStoryAccessories=(()=>{
     ctx.lineCap="round";ctx.lineJoin="round";ctx.shadowBlur=0;
     for(const [i,[kind,location,anchor,angle]] of layouts[act].entries()){
       const center=project(location),start=project(anchor);
+      // Keep peripheral objects legible on narrow screens rather than cutting
+      // them off at the viewport edge. Their tether follows the adjusted center.
+      if(width<700){
+        const margin=Math.min(width/2,unit*1.35/(1-location[2]*.38));
+        center[0]=Math.max(margin,Math.min(width-margin,center[0]));
+      }
       // Thin curved tethers and travelling digits integrate parts with the field.
       const curve=u=>[(1-u)*start[0]+u*center[0],(1-u)*start[1]+u*center[1]-Math.sin(u*Math.PI)*unit*.65];
       for(let j=0;j<20;j++){
