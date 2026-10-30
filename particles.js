@@ -76,6 +76,7 @@
   let height = 0;
   let count = 0;
   let edgeCount = 0;
+  let brainEdgeCount = 0;
   let animationFrame = 0;
   let resizeFrame = 0;
   let lastFrame = 0;
@@ -104,6 +105,10 @@
     gl.uniform1f(uniforms.lineOpacity, (.018 + modes[1] * .16 + modes[2] * .025) * shapes[0]);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, edgeBuffer);
     gl.drawElements(gl.LINES, edgeCount, gl.UNSIGNED_SHORT, 0);
+    if (brainEdgeCount && shapes[2] > .001) {
+      gl.uniform1f(uniforms.lineOpacity, .18 * shapes[2]);
+      gl.drawElements(gl.LINES, brainEdgeCount, gl.UNSIGNED_SHORT, edgeCount * 2);
+    }
     gl.uniform1f(uniforms.linePass, 0);
     if (!reduceMotion.matches) {
       [.18, .08].forEach(delay => {
@@ -180,6 +185,33 @@
       }
       if (nearest >= 0) indices.push(index, nearest);
       const key = `${cellX},${cellY}`;
+      if (!cells.has(key)) cells.set(key, []);
+      cells.get(key).push(index);
+    }
+    return new Uint16Array(indices);
+  }
+
+  function buildBrainEdges(packed) {
+    const cells = new Map();
+    const indices = [];
+    const cellSize = width < 700 ? 18 : 28;
+    const maximum = width < 700 ? 2000 : 5600;
+    for (let index = 0; index < packed.length / 19; index += 2) {
+      const offset = index * 19;
+      if (packed[offset + 6] < .5 || packed[offset + 14] < .17) continue;
+      const point = packed.slice(offset + 11, offset + 14);
+      const cell = point.map(value => Math.floor(value / cellSize));
+      const nearest = [];
+      for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) for (let dz = -1; dz <= 1; dz++) {
+        const candidates = cells.get(`${cell[0] + dx},${cell[1] + dy},${cell[2] + dz}`) || [];
+        candidates.forEach(other => {
+          const distance = point.reduce((sum, value, axis) => sum + (value - packed[other * 19 + 11 + axis]) ** 2, 0);
+          if (distance > 16 && distance < cellSize * cellSize) nearest.push({ other, distance });
+        });
+      }
+      nearest.sort((a, b) => a.distance - b.distance);
+      nearest.slice(0, 2).forEach(({ other }) => { if (indices.length < maximum * 2) indices.push(index, other); });
+      const key = cell.join(',');
       if (!cells.has(key)) cells.set(key, []);
       cells.get(key).push(index);
     }
@@ -267,8 +299,13 @@
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(packed), gl.STATIC_DRAW);
     const edges = buildEdges(geometry);
     edgeCount = edges.length;
+    const brainEdges = buildBrainEdges(packed);
+    brainEdgeCount = brainEdges.length;
+    const combinedEdges = new Uint16Array(edgeCount + brainEdgeCount);
+    combinedEdges.set(edges);
+    combinedEdges.set(brainEdges, edgeCount);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, edgeBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, edges, gl.STATIC_DRAW);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, combinedEdges, gl.STATIC_DRAW);
     stage.classList.add("is-ready");
     syncAnimation();
   }

@@ -9,16 +9,6 @@ window.MXIShapes = (() => {
     return value - Math.floor(value);
   };
   const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
-  function box(center, half, u, v, face) {
-    const p = [(u * 2 - 1) * half[0], (v * 2 - 1) * half[1], 0];
-    const axis = Math.floor(face * 6) % 3;
-    const sign = face < .5 ? 1 : -1;
-    const others = [0, 1, 2].filter(value => value !== axis);
-    p[axis] = sign * half[axis];
-    p[others[0]] = (u * 2 - 1) * half[others[0]];
-    p[others[1]] = (v * 2 - 1) * half[others[1]];
-    return p.map((value, index) => value + center[index]);
-  }
   function tube(a, b, radius, u, angle) {
     const axis = b.map((value, index) => value - a[index]);
     const length = Math.hypot(...axis);
@@ -36,77 +26,133 @@ window.MXIShapes = (() => {
     const v = random(index, 3);
     const angle = v * TAU;
     let p;
-    let alpha = .72;
-    if (pick < .28) {
-      p = box([0, .64, 0], [.54, .37, .31], u, v, random(index, 4));
-      if (p[2] > .3 && Math.abs(p[0]) < .43 && p[1] > .39 && p[1] < .86) alpha = .07;
-    } else if (pick < .36) {
-      const eyeX = random(index, 5) < .5 ? -.23 : .23;
-      const radius = .075 + random(index, 6) * .02;
-      p = [eyeX + Math.cos(angle) * radius, .67 + Math.sin(angle) * radius, .335];
-      alpha = 1;
-    } else if (pick < .395) {
-      p = [(u - .5) * .38, .43 + (Math.floor(v * 3) - 1) * .035, .338];
-      alpha = .95;
-    } else if (pick < .44) {
+    let alpha = .7;
+    let normal = [0, 0, 1];
+    // Human proportions and a modeled facial profile, facing three-quarter right.
+    const facePoint = (x, y) => {
+      const nx = x / .40;
+      const ny = (y - .52) / .66;
+      let z = .48 * Math.sqrt(Math.max(0, 1 - nx * nx - ny * ny));
+      const noseBridge = .11 * Math.exp(-((x / .07) ** 2 + ((y - .48) / .25) ** 2));
+      const noseTip = .13 * Math.exp(-((x / .075) ** 2 + ((y - .31) / .075) ** 2));
+      const sockets = .075 * (Math.exp(-(((x - .17) / .10) ** 2 + ((y - .65) / .065) ** 2))
+        + Math.exp(-(((x + .17) / .10) ** 2 + ((y - .65) / .065) ** 2)));
+      const mouth = .035 * Math.exp(-((x / .16) ** 4 + ((y - .16) / .025) ** 2));
+      const chin = .055 * Math.exp(-((x / .16) ** 2 + ((y - .01) / .09) ** 2));
+      z += noseBridge + noseTip - sockets - mouth + chin;
+      const jaw = .76 + .24 * clamp((y + .10) / .5, 0, 1);
+      return [x * jaw, y, z];
+    };
+    if (pick < .25) {
+      const ny = 1 - u * 2;
+      const ring = Math.sqrt(1 - ny * ny);
+      const nx = ring * Math.cos(angle);
+      const nz = ring * Math.sin(angle);
+      p = [nx * .405, .52 + ny * .66, nz * .48];
+      normal = [nx, ny, nz];
+      alpha = nz > .2 ? .19 : .65;
+      // A dark circular inset leaves the mechanical ear assembly readable.
+      if (nx < -.65 && ((p[1] - .55) ** 2 + (p[2] + .08) ** 2) < .28 ** 2) alpha = .09;
+      const seam = Math.abs(Math.sin(angle * 4 + ny * 1.7));
+      if (seam < .075) alpha = .95;
+    } else if (pick < .53) {
+      const radius = Math.sqrt(u) * .98;
+      const nx = Math.cos(angle) * radius;
+      const ny = Math.sin(angle) * radius;
+      p = facePoint(nx * .39, .52 + ny * .65);
+      normal = [nx, ny, Math.sqrt(Math.max(0, 1 - radius * radius))];
+      alpha = .56 + random(index, 8) * .28;
+      // Fine panel seams follow the brow and cheek rather than cartoon features.
+      if (Math.abs(p[1] - .86 + p[0] * .12) < .012 || Math.abs(Math.abs(p[0]) - .27) < .008) alpha = 1;
+    } else if (pick < .68) {
+      const rings = [.12, .19, .265, .30];
+      const radius = rings[Math.floor(u * rings.length)] + (random(index, 6) - .5) * .012;
+      p = [-.43 - random(index, 7) * .025, .55 + Math.cos(angle) * radius, -.08 + Math.sin(angle) * radius];
+      normal = [-1, 0, 0];
+      alpha = .6 + random(index, 8) * .4;
+      if (u < .10) { p[1] = .55 + Math.cos(angle) * .075; p[2] = -.08 + Math.sin(angle) * .075; }
+    } else if (pick < .72) {
       const side = random(index, 5) < .5 ? -1 : 1;
-      p = tube([side * .55, .63, 0], [side * .66, .63, 0], .12, u, angle);
-    } else if (pick < .47) {
-      p = tube([0, 1.01, 0], [0, 1.24, 0], .027, u, angle);
-      if (u > .8) p = [Math.cos(angle) * .065, 1.25 + Math.sin(angle) * .065, (random(index, 5) - .5) * .08];
-      alpha = .9;
-    } else if (pick < .51) {
-      p = tube([0, .12, 0], [0, .27, 0], .15, u, angle);
-    } else if (pick < .73) {
-      p = box([0, -.36, 0], [.48, .42, .27], u, v, random(index, 4));
-      if (p[2] > .26 && Math.abs(p[0]) < .32 && p[1] > -.64 && p[1] < -.1) alpha = .25;
-    } else if (pick < .89) {
-      const side = random(index, 5) < .5 ? -1 : 1;
-      p = u < .5 ? tube([side * .61, -.08, 0], [side * .83, -.45, .02], .105, u * 2, angle)
-        : tube([side * .83, -.45, .02], [side * .77, -.83, .13], .09, (u - .5) * 2, angle);
-    } else if (pick < .95) {
-      const side = random(index, 5) < .5 ? -1 : 1;
-      p = box([side * .77, -.9, .14], [.115, .1, .1], u, v, random(index, 4));
+      p = facePoint(side * .17 + Math.cos(angle) * .073, .65 + Math.sin(angle) * .033);
+      p[2] += .012;
+      normal = [side * .45, 0, .85];
+      alpha = side < 0 ? 1 : .25;
+    } else if (pick < .76) {
+      p = u < .5 ? facePoint((v - .5) * .018, .28 + u * .75)
+        : facePoint((v - .5) * .29, .16 + (u - .75) * .025);
+      p[2] += .014;
+      alpha = .92;
+    } else if (pick < .88) {
+      const cable = Math.floor(random(index, 5) * 11);
+      const around = cable / 11 * TAU;
+      const t = u;
+      const radius = .15 + .055 * t;
+      p = [Math.cos(around) * radius + Math.sin(t * 4 + cable) * .016,
+        -.13 - t * .65,
+        -.065 + Math.sin(around) * radius + t * .035];
+      p[0] += Math.cos(angle) * .015;
+      p[2] += Math.sin(angle) * .015;
+      normal = [Math.cos(around), 0, Math.sin(around)];
+      alpha = .55 + random(index, 8) * .3;
+      if (random(index, 7) < .25) {
+        const rib = Math.floor(t * 9) / 9;
+        p = [Math.cos(angle) * .205, -.16 - rib * .59, -.065 + Math.sin(angle) * .205];
+        alpha = .75;
+      }
     } else {
-      const radius = .13 + random(index, 6) * .025;
-      p = [Math.cos(angle) * radius, -.29 + Math.sin(angle) * radius, .29];
-      alpha = 1;
+      const nx = u * 2 - 1;
+      const depth = Math.sqrt(Math.max(0, 1 - nx * nx));
+      const top = -.70 - Math.abs(nx) * .16;
+      p = [nx * 1.03, top - v * .46, -.04 + depth * (.34 + .07 * Math.cos(v * Math.PI))];
+      normal = [nx * .4, .2, depth];
+      const plating = Math.abs(Math.sin(nx * 10 + v * 2.6));
+      alpha = plating < .11 ? .95 : .36 + random(index, 8) * .28;
+      if (Math.abs(nx) < .12 && v < .15) alpha *= .25;
     }
-    return [p[0] * scale, (p[1] - .12) * scale, p[2] * scale, alpha];
+    const yaw = pick >= .88 ? .65 : 1.35;
+    const c = Math.cos(yaw);
+    const s = Math.sin(yaw);
+    const x = c * p[0] + s * p[2];
+    const z = -s * p[0] + c * p[2];
+    const normalX = c * normal[0] + s * normal[2];
+    const normalZ = -s * normal[0] + c * normal[2];
+    const facing = clamp(normalX * .257 + normalZ * .966, 0, 1);
+    alpha *= .20 + .80 * facing;
+    return [x * scale, (p[1] * .88 + .04) * scale, z * scale, alpha];
   }
   function brain(index, count, scale) {
-    const u = (index + .5) / count;
-    const y = 1 - 2 * u;
-    const ring = Math.sqrt(Math.max(0, 1 - y * y));
+    const ny = 1 - 2 * (index + .5) / count;
+    const ring = Math.sqrt(Math.max(0, 1 - ny * ny));
     const phi = index * goldenAngle;
-    const theta = Math.acos(y);
+    const theta = Math.acos(ny);
     const nx = ring * Math.cos(phi);
     const nz = ring * Math.sin(phi);
-    const folds = Math.sin(phi * 12 + 2.5 * Math.sin(theta * 5)) * Math.sin(theta * 11 + Math.sin(phi * 3));
-    const ripple = 1 + folds * .065 + Math.sin(theta * 24 + phi * 2) * .018;
-    let x = nx * 1.13 * ripple;
-    let py = y * .79 * ripple + .12;
-    let z = nz * .86 * ripple;
-    const cleft = Math.exp(-nx * nx * 180);
-    py -= cleft * Math.max(0, y) * .15;
-    z -= cleft * Math.max(0, nz) * .10;
-    x += Math.sign(nx) * .018;
-    let alpha = .10 + (.5 + folds * .5) ** 3 * .86;
-    if (nz > 0) alpha *= 1 - cleft * .75;
     const pick = random(index, 11);
+    const folds = Math.sin(phi * 9 + Math.sin(theta * 5) * 2) * Math.sin(theta * 8 + Math.sin(phi * 3));
+    const ripple = 1 + folds * .045;
+    let p;
+    let alpha;
     if (pick < .065) {
-      const p = tube([-.04, -.53, -.08], [.08, -.98, -.1], .10, random(index, 12), random(index, 13) * TAU);
-      [x, py, z] = p;
-      alpha = .65;
-    } else if (pick < .14) {
-      const r = 1 + Math.sin(phi * 18) * .04;
-      x = nx * .39 * r;
-      py = -.5 + y * .27 * r;
-      z = -.3 + nz * .32 * r;
-      alpha = .5;
+      p = tube([.24, -.40, -.03], [.43, -.99, -.04], .075, random(index, 12), random(index, 13) * TAU);
+      alpha = .75;
+    } else if (pick < .17) {
+      // The cerebellum sits below and behind the large cerebral hemisphere.
+      const ridges = 1 + Math.sin(theta * 24) * .035;
+      p = [.59 + nx * .36 * ridges, -.52 + ny * .26 * ridges, -.03 + nz * .32 * ridges];
+      alpha = .45 + Math.abs(Math.sin(theta * 24)) * .35;
+    } else if (pick < .34) {
+      // A lower temporal lobe gives the characteristic side-profile outline.
+      p = [-.12 + nx * .84 * ripple, -.24 + ny * .30 * ripple, .07 + nz * .45 * ripple];
+      alpha = .4 + (.5 + folds * .5) * .4;
+    } else {
+      p = [-.07 + nx * 1.06 * ripple, .20 + ny * .66 * ripple, nz * .48 * ripple];
+      if (nx < -.45) p[0] -= .065 * Math.exp(-(((ny + .20) / .45) ** 2));
+      alpha = .35 + (.5 + folds * .5) * .5;
+      const seam = Math.abs(p[1] + .14 - p[0] * .23);
+      if (seam < .022 && nz > 0) alpha = 1;
     }
-    const front = .25 + .75 * clamp((nz + .3) / 1.3, 0, 1);
-    return [x * scale, py * scale, z * scale, alpha * front];
+    const front = .18 + .82 * clamp((nz + .18) / 1.18, 0, 1);
+    return [p[0] * scale, p[1] * scale, p[2] * scale, alpha * front];
   }
   // Stylized continental outlines, sufficient for a recognizable globe.
   const continents = [
@@ -116,7 +162,11 @@ window.MXIShapes = (() => {
     [[-81,12],[-67,10],[-50,2],[-35,-7],[-43,-23],[-55,-35],[-69,-55],[-77,-40],[-71,-19],[-80,-1]],
     [[112,-11],[130,-11],[139,-17],[153,-25],[147,-39],[129,-34],[114,-25]],
     [[-52,59],[-29,65],[-20,78],[-42,83],[-62,78]],
-    [[47,-13],[51,-16],[48,-26],[44,-23]]
+    [[47,-13],[51,-16],[48,-26],[44,-23]],
+    [[130,31],[132,34],[136,36],[140,41],[143,44],[146,44],[144,39],[140,36],[136,33]],
+    [[119,19],[124,18],[127,9],[125,5],[121,9]],
+    [[95,5],[103,1],[106,-6],[115,-8],[124,-8],[132,-6],[135,-3],[127,1],[119,1],[112,4],[107,-2],[102,2]],
+    [[166,-34],[179,-38],[176,-46],[169,-47]]
   ];
   function inPolygon(lon, lat, polygon) {
     let inside = false;
@@ -131,15 +181,29 @@ window.MXIShapes = (() => {
     const y = 1 - 2 * (index + .5) / count;
     const lon = (index * goldenAngle) % TAU - Math.PI;
     const lat = Math.asin(y);
-    const ring = Math.sqrt(1 - y * y);
-    const x = ring * Math.sin(lon);
-    const z = ring * Math.cos(lon);
     const latitude = lat * 180 / Math.PI;
     const longitude = lon * 180 / Math.PI;
-    const land = continents.some(polygon => inPolygon(longitude, latitude, polygon)) || latitude < -72;
-    const grid = Math.abs(latitude / 15 - Math.round(latitude / 15)) < .07 || Math.abs(longitude / 20 - Math.round(longitude / 20)) < .045;
-    const front = .12 + .88 * clamp((z * .96 + x * .26 + .1) / 1.1, 0, 1);
-    const alpha = (land ? .95 : grid ? .35 : .07) * front;
+    const isLand = (longitude, latitude) => continents.some(polygon => inPolygon(longitude, latitude, polygon)) || latitude < -72;
+    if (random(index, 21) < .095) {
+      const angle = random(index, 22) * TAU;
+      const radius = 1.08 + random(index, 23) * .13;
+      return [Math.cos(angle) * radius * scale, Math.sin(angle) * radius * scale, -.15 * scale,
+        .07 + random(index, 24) * .08];
+    }
+    // The fixed view centers on Asia and the Pacific, with Australia below.
+    const viewLon = lon - 100 * Math.PI / 180;
+    const ring = Math.sqrt(1 - y * y);
+    const x = ring * Math.sin(viewLon);
+    const z = ring * Math.cos(viewLon);
+    const land = isLand(longitude, latitude);
+    const coast = land && (!isLand(longitude - 2, latitude) || !isLand(longitude + 2, latitude)
+      || !isLand(longitude, latitude - 1.5) || !isLand(longitude, latitude + 1.5));
+    const grid = Math.abs(latitude / 15 - Math.round(latitude / 15)) < .06 || Math.abs(longitude / 20 - Math.round(longitude / 20)) < .035;
+    const viewDepth = z * .966 + x * .257;
+    const front = .035 + .965 * clamp((viewDepth + .10) / .5, 0, 1);
+    const limb = Math.exp(-viewDepth * viewDepth * 150);
+    const brightness = coast ? 1 : land ? .72 : grid ? .24 : .025;
+    const alpha = Math.min(1, brightness + limb * .35) * front;
     return [x * scale, y * scale, z * scale, alpha];
   }
   function weights(time) {

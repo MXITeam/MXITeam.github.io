@@ -2,7 +2,7 @@
 
 **https://mxiteam.github.io/**
 
-A minimal English homepage on black. A single batch of luminous binary digits smoothly cycles through **MXI → robot → brain → Earth → MXI**. Each form holds for five seconds, then morphs for three seconds, completing a 32-second loop. The camera remains fixed, with depth from front, back, and side geometry.
+A minimal English homepage on black. A single batch of luminous binary digits smoothly cycles through **MXI → robot → brain → Earth → MXI**. Each form holds for five seconds, then morphs for three seconds, completing a 32-second loop. The camera remains fixed, with depth from front, back, and side geometry. The robot is an anatomical android profile with a mechanical ear, neck cables, and shoulder armor. The lateral brain has a cerebellum, brainstem, and dedicated network connections. The globe centers on Asia and the Pacific, with highlighted coasts, sparse ocean digits, and a surrounding particle halo.
 
 The visible page contains only the supplied logo, GitHub link, particle scene, and **Mathematics x Intelligence** caption. There are no extra sections, labels, explanatory sentences, mode controls, or animation buttons.
 
