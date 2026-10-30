@@ -337,16 +337,20 @@
     cancelAnimationFrame(frame);frame=0;lastClock=0;lastPaint=0;render();
     if(!paused&&visible&&!document.hidden&&!reduced.matches&&!lost)frame=requestAnimationFrame(animate);
   }
-  function renderDpr(viewWidth){
+  function renderDpr(viewWidth,viewHeight){
     const deviceDpr=window.devicePixelRatio||1;
-    return viewWidth<700?Math.max(2,Math.min(deviceDpr,3)):Math.min(deviceDpr,2);
+    if(viewWidth<700)return Math.max(2,Math.min(deviceDpr,3));
+    // On low-density desktops, fine binary strokes alias into horizontal
+    // bands. Supersample up to 2x, with a pixel budget for larger stages.
+    const nativeDpr=Math.min(deviceDpr,2);
+    const budgetDpr=Math.sqrt(3000000/Math.max(1,viewWidth*viewHeight));
+    return Math.max(nativeDpr,Math.min(2,budgetDpr));
   }
   function resize(){
     if(lost)return;
     const bounds=stage.getBoundingClientRect(),w=Math.round(bounds.width),h=Math.round(bounds.height);
-    // Supersample narrow low-density screens so fine contours survive the
-    // browser's reduction to CSS size without multiplying wide-screen cost.
-    const nextDpr=renderDpr(w);
+    // Keep fine contours legible on low-density screens within the pixel budget.
+    const nextDpr=renderDpr(w,h);
     if(!w||!h||(w===width&&h===height&&nextDpr===dpr))return;
     // Phones have dense displays but a small subject: allow 3x backing pixels there.
     width=w;height=h;dpr=nextDpr;size=width<700?Math.min(width*.47,height*.32):Math.min(width*.36,height*.4);
@@ -426,7 +430,7 @@
   // event. Check infrequently while visible so paused/reduced-motion previews
   // also refresh instead of retaining a blurry old backing canvas.
   setInterval(()=>{
-    if(!lost&&visible&&!document.hidden&&renderDpr(width)!==dpr){
+    if(!lost&&visible&&!document.hidden&&renderDpr(width,height)!==dpr){
       watchResolution();scheduleResize();
     }
   },1000);
