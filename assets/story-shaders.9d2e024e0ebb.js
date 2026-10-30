@@ -133,6 +133,7 @@ window.MXIStoryShaders=Object.freeze({
     uniform vec2 u_fieldSize;
     uniform float u_dpr;
     uniform float u_time;
+    uniform float u_stream;
     float segment(vec2 p,vec2 a,vec2 b){vec2 d=b-a;return length(p-a-d*clamp(dot(p-a,d)/dot(d,d),0.,1.));}
     void main(){
       vec2 screen=gl_FragCoord.xy/u_dpr;
@@ -161,6 +162,12 @@ window.MXIStoryShaders=Object.freeze({
       float cellPulse=smoothstep(-.45,.55,sin(u_time*rate+seed*6.2831853));
       float band=smoothstep(-.6,.8,sin(index.x*.11-index.y*.07+u_time*.55)+.6*sin(index.y*.05+u_time*.31));
       float twinkle=(.70+.30*cellPulse)*(.80+.20*band)*1.1;
+      // Open irregular gaps in the dense current while it travels. The slow
+      // moving modulation avoids a hard, screen-fixed cutout and fades away
+      // before the next silhouette settles.
+      float current=sin(index.x*.055-u_time*1.05+sin(index.y*.14)*1.4);
+      float gap=smoothstep(-.7,.45,current+(seed-.5)*1.2);
+      intensity*=mix(1.,.32+.68*gap,u_stream*.82);
       gl_FragColor=vec4(vec3(.93,.97,1.)*glyph*intensity*twinkle,1.);
     }
   `

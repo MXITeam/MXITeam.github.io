@@ -41,7 +41,7 @@
   const quad=gl.createBuffer(),fieldTexture=gl.createTexture(),fieldBuffer=gl.createFramebuffer(),fieldDepth=gl.createRenderbuffer();
   if(!quad||!fieldTexture||!fieldBuffer||!fieldDepth)return;
   const quadAttribute=gl.getAttribLocation(asciiProgram,"a_quad");
-  const asciiUniforms=Object.fromEntries(["field","resolution","grid","fieldSize","dpr","time"].map(n=>[n,gl.getUniformLocation(asciiProgram,"u_"+n)]));
+  const asciiUniforms=Object.fromEntries(["field","resolution","grid","fieldSize","dpr","time","stream"].map(n=>[n,gl.getUniformLocation(asciiProgram,"u_"+n)]));
   gl.bindBuffer(gl.ARRAY_BUFFER,quad);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
   gl.bindTexture(gl.TEXTURE_2D,fieldTexture);
   gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);
@@ -320,7 +320,7 @@
     gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,fieldTexture);gl.uniform1i(asciiUniforms.field,0);
     gl.uniform2f(asciiUniforms.resolution,width,height);gl.uniform2f(asciiUniforms.grid,gridWidth,gridHeight);
     gl.uniform2f(asciiUniforms.fieldSize,fieldWidth,fieldHeight);
-    gl.uniform1f(asciiUniforms.dpr,dpr);gl.uniform1f(asciiUniforms.time,t);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+    gl.uniform1f(asciiUniforms.dpr,dpr);gl.uniform1f(asciiUniforms.time,t);gl.uniform1f(asciiUniforms.stream,ribbonWeight);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
     sceneLayers?.drawGL({state,width,height,view,camera:cam,size:objectSize,time:t});
     foregroundScene(state,t,cam);
   }
