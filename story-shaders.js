@@ -138,13 +138,15 @@ window.MXIStoryShaders=Object.freeze({
       float zero=abs(length(p/vec2(.4,.67))-1.)*.4;
       float one=min(segment(p,vec2(-.23,-.39),vec2(.035,-.65)),min(segment(p,vec2(.035,-.65),vec2(.035,.65)),segment(p,vec2(-.23,.65),vec2(.29,.65))));
       float glyph=1.-smoothstep(.05,.105,mix(zero,one,digit));
-      float intensity=pow(clamp(light,0.,1.),.62);
+      // Lift midtones with a soft shoulder so facial and mechanical details
+      // remain readable without turning bright regions into a flat white mask.
+      float intensity=1.2*(1.-exp(-1.8*pow(clamp(light,0.,1.),.62)));
       // Each glyph fades out and back on its own clock; a slow screen-space
       // band makes whole strands dim together, so lines appear and disappear.
       float rate=.7+fract(seed*7.13)*1.6;
       float cellPulse=smoothstep(-.45,.55,sin(u_time*rate+seed*6.2831853));
       float band=smoothstep(-.6,.8,sin(index.x*.11-index.y*.07+u_time*.55)+.6*sin(index.y*.05+u_time*.31));
-      float twinkle=(.42+.58*cellPulse)*(.62+.38*band)*1.25;
+      float twinkle=(.70+.30*cellPulse)*(.80+.20*band)*1.1;
       gl_FragColor=vec4(vec3(.93,.97,1.)*glyph*intensity*twinkle,1.);
     }
   `
