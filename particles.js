@@ -1,97 +1,15 @@
 "use strict";
 
-// Volumetric binary lettering. Geometry and 0/1 glyphs are generated locally.
 (() => {
   const stage = document.querySelector("#particle-stage");
   const canvas = document.querySelector("#mxi-particles");
   const motionToggle = document.querySelector("#motion-toggle");
-  if (!stage || !canvas || !motionToggle) return;
-
+  if (!stage || !canvas || !motionToggle || !window.MXIParticleShaders) return;
   const gl = canvas.getContext("webgl", { alpha: false, antialias: false, powerPreference: "low-power" });
   if (!gl) return;
   const mask = document.createElement("canvas");
   const maskContext = mask.getContext("2d", { willReadFrequently: true });
   if (!maskContext) return;
-
-  const vertexSource = `
-    precision highp float;
-    attribute vec3 a_position;
-    attribute vec4 a_traits;
-    uniform vec2 u_resolution;
-    uniform vec2 u_pointer;
-    uniform float u_pointerActive;
-    uniform float u_time;
-    uniform float u_dpr;
-    uniform mediump float u_glowPass;
-    varying mediump float v_alpha;
-    varying mediump float v_light;
-    varying mediump float v_digit;
-    void main() {
-      float t = u_time;
-      float phase = a_traits.y;
-      float isLetter = a_traits.w;
-      vec3 p = a_position;
-      float cycle = mod(t, 14.0);
-      float burst = smoothstep(9.0, 10.4, cycle) * (1.0 - smoothstep(11.3, 13.5, cycle));
-      float entrance = 1.0 - smoothstep(0.0, 2.4, t);
-      p.x += sin(t * 1.5 + phase) * 2.4 * isLetter;
-      p.y += cos(t * 1.25 + phase) * 2.0 * isLetter;
-      p.z += sin(p.x * 0.018 + p.y * 0.02 + t * 1.7 + phase * 0.2) * 10.0;
-      vec3 direction = vec3(sin(phase * 2.7), cos(phase * 1.6), sin(phase * 3.1));
-      p += direction * (burst * 31.0 + entrance * u_resolution.x * 0.22) * isLetter;
-
-      float rotateY = -0.24 + sin(t * 0.34) * 0.26;
-      float rotateX = 0.09 + sin(t * 0.27) * 0.055;
-      float rotateZ = sin(t * 0.22) * 0.018;
-      p.xz = mat2(cos(rotateY), -sin(rotateY), sin(rotateY), cos(rotateY)) * p.xz;
-      p.yz = mat2(cos(rotateX), -sin(rotateX), sin(rotateX), cos(rotateX)) * p.yz;
-      p.xy = mat2(cos(rotateZ), -sin(rotateZ), sin(rotateZ), cos(rotateZ)) * p.xy;
-
-      float camera = max(u_resolution.x * 1.25, 850.0);
-      float perspective = camera / (camera - p.z);
-      vec2 screen = p.xy * perspective;
-      vec2 difference = screen - u_pointer;
-      float distance = length(difference);
-      float pointerRadius = min(u_resolution.x * 0.23, 150.0);
-      float influence = (1.0 - smoothstep(0.0, pointerRadius, distance)) * u_pointerActive * isLetter;
-      screen += difference / max(distance, 1.0) * influence * 43.0;
-      gl_Position = vec4(screen.x / (u_resolution.x * 0.5), screen.y / (u_resolution.y * 0.5), 0.0, 1.0);
-      float sparkle = 0.82 + 0.18 * sin(t * 2.0 + phase * 4.0);
-      float glowScale = mix(1.0, 2.2, u_glowPass);
-      gl_PointSize = clamp(a_traits.x * perspective * u_dpr * sparkle * glowScale, 6.0, 52.0);
-      v_alpha = a_traits.z * (0.7 + 0.3 * sparkle);
-      v_light = 0.94 + 0.06 * sin(p.x * 0.006 - t * 0.7 + phase);
-      v_digit = step(0.5, fract(phase * 0.23 + floor(t * 0.5 + phase) * 0.618));
-    }
-  `;
-  const fragmentSource = `
-    precision mediump float;
-    varying mediump float v_alpha;
-    varying mediump float v_light;
-    varying mediump float v_digit;
-    uniform mediump float u_glowPass;
-    float segmentDistance(vec2 point, vec2 start, vec2 end) {
-      vec2 direction = end - start;
-      float fraction = clamp(dot(point - start, direction) / dot(direction, direction), 0.0, 1.0);
-      return length(point - start - direction * fraction);
-    }
-    void main() {
-      vec2 point = (gl_PointCoord - vec2(0.5)) * vec2(2.0, -2.0);
-      // Signed-distance-style masks keep each binary digit crisp at any scale.
-      float zeroDistance = abs(length(point / vec2(0.38, 0.66)) - 1.0) * 0.38;
-      float oneDistance = min(
-        segmentDistance(point, vec2(0.04, -0.64), vec2(0.04, 0.64)),
-        min(segmentDistance(point, vec2(-0.26, 0.38), vec2(0.04, 0.64)),
-            segmentDistance(point, vec2(-0.26, -0.64), vec2(0.31, -0.64)))
-      );
-      float glyphDistance = mix(zeroDistance, oneDistance, v_digit);
-      float glyph = 1.0 - smoothstep(0.055, 0.13, glyphDistance);
-      float halo = exp(-dot(point, point) * 4.0) * 0.065;
-      float alpha = mix(glyph * 1.25, halo, u_glowPass) * v_alpha;
-      if (alpha < 0.008) discard;
-      gl_FragColor = vec4(vec3(0.95, 0.98, 1.0) * v_light, alpha);
-    }
-  `;
 
   function compile(type, source) {
     const shader = gl.createShader(type);
@@ -99,23 +17,29 @@
     gl.shaderSource(shader, source);
     gl.compileShader(shader);
     if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) return shader;
+    console.warn("MXI graphics:", gl.getShaderInfoLog(shader));
     gl.deleteShader(shader);
     return null;
   }
-  const vertex = compile(gl.VERTEX_SHADER, vertexSource);
-  const fragment = compile(gl.FRAGMENT_SHADER, fragmentSource);
+  const vertex = compile(gl.VERTEX_SHADER, window.MXIParticleShaders.vertexSource);
+  const fragment = compile(gl.FRAGMENT_SHADER, window.MXIParticleShaders.fragmentSource);
   if (!vertex || !fragment) return;
   const program = gl.createProgram();
   if (!program) return;
   gl.attachShader(program, vertex);
   gl.attachShader(program, fragment);
   gl.linkProgram(program);
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return;
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+    console.warn("MXI graphics:", gl.getProgramInfoLog(program));
+    return;
+  }
   gl.deleteShader(vertex);
   gl.deleteShader(fragment);
   gl.useProgram(program);
   const buffer = gl.createBuffer();
-  if (!buffer) return;
+  const edgeBuffer = gl.createBuffer();
+  const texture = gl.createTexture();
+  if (!buffer || !edgeBuffer || !texture) return;
   gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
   const position = gl.getAttribLocation(program, "a_position");
   const traits = gl.getAttribLocation(program, "a_traits");
@@ -123,15 +47,31 @@
   gl.vertexAttribPointer(position, 3, gl.FLOAT, false, 28, 0);
   gl.enableVertexAttribArray(traits);
   gl.vertexAttribPointer(traits, 4, gl.FLOAT, false, 28, 12);
-  const uniforms = Object.fromEntries(["resolution", "pointer", "pointerActive", "time", "dpr", "glowPass"].map(name => [name, gl.getUniformLocation(program, "u_" + name)]));
+  const uniforms = Object.fromEntries([
+    "resolution", "dpr", "time", "echo", "glowPass", "mode", "bounds", "pointer", "pointerActive", "pointerEnergy", "linePass", "lineOpacity", "wordMask"
+  ].map(name => [name, gl.getUniformLocation(program, "u_" + name)]));
+  uniforms.pulses = gl.getUniformLocation(program, "u_pulses[0]");
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+  gl.uniform1i(uniforms.wordMask, 0);
   gl.enable(gl.BLEND);
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
   gl.clearColor(0, 0, 0, 1);
 
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const modes = new Float32Array([1, 0, 0]);
+  const pulses = new Float32Array([0, 0, -1000, 0, 0, 0, -1000, 0, 0, 0, -1000, 0]);
+  const pointer = { x: 0, y: 0, targetX: 0, targetY: 0, active: 0, targetActive: 0, energy: 0 };
+  let nextPulse = 0;
   let width = 0;
   let height = 0;
   let count = 0;
+  let edgeCount = 0;
   let animationFrame = 0;
   let resizeFrame = 0;
   let lastFrame = 0;
@@ -140,16 +80,31 @@
   let paused = false;
   let visible = true;
   let contextLost = false;
-  let pointerActive = 0;
-  let pointerX = 0;
-  let pointerY = 0;
+  let pointerDown = null;
 
   function render() {
     if (contextLost) return;
     gl.clear(gl.COLOR_BUFFER_BIT);
     gl.uniform1f(uniforms.time, reduceMotion.matches ? 3 : elapsed);
-    gl.uniform2f(uniforms.pointer, pointerX, pointerY);
-    gl.uniform1f(uniforms.pointerActive, paused || reduceMotion.matches ? 0 : pointerActive);
+    gl.uniform3fv(uniforms.mode, modes);
+    gl.uniform2f(uniforms.pointer, pointer.x, pointer.y);
+    gl.uniform1f(uniforms.pointerActive, paused || reduceMotion.matches ? 0 : pointer.active);
+    gl.uniform1f(uniforms.pointerEnergy, pointer.energy);
+    gl.uniform4fv(uniforms.pulses, pulses);
+    gl.uniform1f(uniforms.echo, 0);
+    gl.uniform1f(uniforms.glowPass, 0);
+    gl.uniform1f(uniforms.linePass, 1);
+    gl.uniform1f(uniforms.lineOpacity, .018 + modes[1] * .16 + modes[2] * .025);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, edgeBuffer);
+    gl.drawElements(gl.LINES, edgeCount, gl.UNSIGNED_SHORT, 0);
+    gl.uniform1f(uniforms.linePass, 0);
+    if (!reduceMotion.matches) {
+      [.18, .08].forEach(delay => {
+        gl.uniform1f(uniforms.echo, delay);
+        gl.drawArrays(gl.POINTS, 0, count);
+      });
+    }
+    gl.uniform1f(uniforms.echo, 0);
     gl.uniform1f(uniforms.glowPass, 1);
     gl.drawArrays(gl.POINTS, 0, count);
     gl.uniform1f(uniforms.glowPass, 0);
@@ -160,9 +115,25 @@
     animationFrame = 0;
     const interval = width < 700 ? 1000 / 30 : 1000 / 45;
     if (clock - lastFrame >= interval) {
-      if (lastClock) elapsed += Math.min((clock - lastClock) / 1000, .08);
+      const delta = lastClock ? Math.min((clock - lastClock) / 1000, .08) : 0;
+      elapsed += delta;
       lastClock = clock;
       lastFrame = clock;
+      const smoothing = 1 - Math.exp(-delta * 7);
+      const cycle = elapsed % 28;
+      const ease = (start, end, value) => {
+        const x = Math.min(1, Math.max(0, (value - start) / (end - start)));
+        return x * x * (3 - 2 * x);
+      };
+      const network = ease(7, 10, cycle) * (1 - ease(13, 16, cycle));
+      const wave = ease(18, 21, cycle) * (1 - ease(25, 28, cycle));
+      modes[0] = 1 - network - wave;
+      modes[1] = network;
+      modes[2] = wave;
+      pointer.x += (pointer.targetX - pointer.x) * smoothing;
+      pointer.y += (pointer.targetY - pointer.y) * smoothing;
+      pointer.active += (pointer.targetActive - pointer.active) * smoothing;
+      pointer.energy *= Math.exp(-delta * 3);
       render();
     }
     if (!paused && visible && !document.hidden && !reduceMotion.matches && !contextLost) animationFrame = requestAnimationFrame(animate);
@@ -176,6 +147,35 @@
     motionToggle.hidden = reduceMotion.matches || contextLost;
     render();
     if (!paused && visible && !document.hidden && !reduceMotion.matches && !contextLost) animationFrame = requestAnimationFrame(animate);
+  }
+
+  function buildEdges(geometry) {
+    const cells = new Map();
+    const indices = [];
+    const cellSize = 28;
+    const maxEdges = width < 700 ? 700 : 1800;
+    for (let index = 0; index < geometry.length / 7 && indices.length < maxEdges * 2; index++) {
+      const offset = index * 7;
+      if (geometry[offset + 6] < .5 || geometry[offset + 2] < 0) continue;
+      const x = geometry[offset];
+      const y = geometry[offset + 1];
+      const cellX = Math.floor(x / cellSize);
+      const cellY = Math.floor(y / cellSize);
+      let nearest = -1;
+      let bestDistance = cellSize * cellSize;
+      for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) {
+        const candidates = cells.get(`${cellX + dx},${cellY + dy}`) || [];
+        candidates.forEach(other => {
+          const distance = (geometry[other * 7] - x) ** 2 + (geometry[other * 7 + 1] - y) ** 2;
+          if (distance < bestDistance && distance > 9) { bestDistance = distance; nearest = other; }
+        });
+      }
+      if (nearest >= 0) indices.push(index, nearest);
+      const key = `${cellX},${cellY}`;
+      if (!cells.has(key)) cells.set(key, []);
+      cells.get(key).push(index);
+    }
+    return new Uint16Array(indices);
   }
 
   function resize() {
@@ -194,7 +194,7 @@
     gl.uniform1f(uniforms.dpr, dpr);
     mask.width = width;
     mask.height = height;
-    let fontSize = Math.min(height * .93, width * .44);
+    let fontSize = Math.min(height * 1.02, width * .44);
     const setFont = () => { maskContext.font = `900 ${fontSize}px "Arial Black", Arial, sans-serif`; };
     setFont();
     let metrics = maskContext.measureText("MXI");
@@ -205,63 +205,94 @@
     }
     maskContext.fillStyle = "white";
     maskContext.textAlign = "center";
-    const baseline = (height + metrics.actualBoundingBoxAscent - metrics.actualBoundingBoxDescent) / 2 - height * .025;
+    const baseline = (height + metrics.actualBoundingBoxAscent - metrics.actualBoundingBoxDescent) / 2;
     maskContext.fillText("MXI", width / 2, baseline);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, mask);
+
+    const top = Math.max(0, baseline - metrics.actualBoundingBoxAscent);
+    const bottom = Math.min(height - 1, baseline + metrics.actualBoundingBoxDescent);
+    const left = Math.max(0, (width - metrics.width) / 2);
+    const right = Math.min(width - 1, left + metrics.width);
+    gl.uniform2f(uniforms.bounds, height / 2 - bottom, Math.max(1, bottom - top));
+    const gap = width < 700 ? 6 : 9;
+    const depth = fontSize * .32;
     const pixels = maskContext.getImageData(0, 0, width, height).data;
     const alphaAt = (x, y) => x < 0 || y < 0 || x >= width || y >= height ? 0 : pixels[(Math.floor(y) * width + Math.floor(x)) * 4 + 3];
-    const gap = width < 700 ? 5 : 8;
-    const depth = fontSize * .23;
     const candidates = [];
-    const addPoint = (x, y, z, size, opacity, letter = 1) => candidates.push([x, y, z, size, Math.random() * Math.PI * 2, opacity, letter]);
-    for (let y = gap; y < height - gap; y += gap) {
-      for (let x = gap; x < width - gap; x += gap) {
-        if (alphaAt(x, y) < 160) continue;
-        const px = x - width / 2 + (Math.random() - .5) * gap * .3;
-        const py = height / 2 - y + (Math.random() - .5) * gap * .3;
-        const size = width < 700 ? 7 + Math.random() * 2 : 10 + Math.random() * 3;
-        addPoint(px, py, depth / 2, size, .65 + Math.random() * .35);
-        addPoint(px, py, -depth / 2, size * .8, .18 + Math.random() * .2);
-        const edge = alphaAt(x - gap, y) < 100 || alphaAt(x + gap, y) < 100 || alphaAt(x, y - gap) < 100 || alphaAt(x, y + gap) < 100;
-        if (edge) {
-          for (let z = -depth / 2; z < depth / 2; z += gap * 1.6) addPoint(px, py, z, size, .5 + Math.random() * .4);
-        } else if (Math.random() < .12) {
-          addPoint(px, py, (Math.random() - .5) * depth, size * .75, .25);
+    for (let y = top; y <= bottom; y += gap) for (let x = left; x <= right; x += gap) {
+      const px = x - width / 2 + (Math.random() - .5) * 1.5;
+      const py = height / 2 - y;
+      const size = width < 700 ? 8 + Math.random() * 1.5 : 11 + Math.random() * 2;
+      candidates.push([px, py, depth / 2, size, Math.random() * Math.PI * 2, .78 + Math.random() * .22, 1]);
+      candidates.push([px, py, -depth / 2, size * .8, Math.random() * Math.PI * 2, .22 + Math.random() * .12, 1]);
+      const edge = alphaAt(x, y) > 160 && (alphaAt(x - gap, y) < 100 || alphaAt(x + gap, y) < 100 || alphaAt(x, y - gap) < 100 || alphaAt(x, y + gap) < 100);
+      if (edge) {
+        for (let z = -depth / 2 + gap; z < depth / 2; z += gap * 1.4) {
+          candidates.push([px, py, z, size * .88, Math.random() * Math.PI * 2, .4 + Math.random() * .2, 1]);
         }
       }
     }
-    const limit = width < 700 ? 3000 : 7000;
+    const limit = width < 700 ? 2800 : 6800;
     const stride = Math.max(1, candidates.length / limit);
     const geometry = [];
     for (let index = 0; index < candidates.length; index += stride) geometry.push(...candidates[Math.floor(index)]);
-    // A quiet floor of binary digits anchors the letters in the same 3D space.
-    const floorY = -(metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent) / 2 - height * .06;
-    const floorCount = width < 700 ? 220 : 500;
+    const floorCount = width < 700 ? 180 : 420;
     for (let index = 0; index < floorCount; index++) {
-      const x = (Math.random() - .5) * width * 1.25;
-      const z = (Math.random() - .5) * 580;
-      geometry.push(x, floorY, z, 6 + Math.random() * 3, Math.random() * Math.PI * 2, .06 + Math.random() * .14, 0);
+      geometry.push((Math.random() - .5) * width, height / 2 - bottom - 30, (Math.random() - .5) * 480,
+        6 + Math.random() * 2, Math.random() * Math.PI * 2, .04 + Math.random() * .08, 0);
     }
     count = geometry.length / 7;
+    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(geometry), gl.STATIC_DRAW);
+    const edges = buildEdges(geometry);
+    edgeCount = edges.length;
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, edgeBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, edges, gl.STATIC_DRAW);
     stage.classList.add("is-ready");
     syncAnimation();
   }
 
-  stage.addEventListener("pointermove", event => {
-    if (event.pointerType === "touch" || paused || reduceMotion.matches) return;
+  function updatePointer(event) {
     const bounds = canvas.getBoundingClientRect();
-    pointerX = event.clientX - bounds.left - width / 2;
-    pointerY = height / 2 - (event.clientY - bounds.top);
-    pointerActive = 1;
+    const x = event.clientX - bounds.left - width / 2;
+    const y = height / 2 - (event.clientY - bounds.top);
+    pointer.energy = Math.min(1, Math.hypot(x - pointer.targetX, y - pointer.targetY) / 35);
+    pointer.targetX = x;
+    pointer.targetY = y;
+    pointer.targetActive = 1;
+  }
+
+  function sendPulse(x = 0, y = 0) {
+    if (paused || reduceMotion.matches || contextLost) return;
+    pulses.set([x, y, elapsed, 1], nextPulse * 4);
+    nextPulse = (nextPulse + 1) % 3;
+  }
+
+  stage.addEventListener("pointermove", event => {
+    if (paused || reduceMotion.matches || event.pointerType === "touch") return;
+    updatePointer(event);
   }, { passive: true });
-  stage.addEventListener("pointerleave", () => { pointerActive = 0; });
+  stage.addEventListener("pointerleave", () => { pointer.targetActive = 0; });
+  stage.addEventListener("pointerdown", event => { pointerDown = { x: event.clientX, y: event.clientY }; }, { passive: true });
+  stage.addEventListener("pointercancel", () => { pointerDown = null; pointer.targetActive = 0; });
+  stage.addEventListener("pointerup", event => {
+    if (!pointerDown || Math.hypot(event.clientX - pointerDown.x, event.clientY - pointerDown.y) > 12) { pointerDown = null; return; }
+    updatePointer(event);
+    sendPulse(pointer.targetX, pointer.targetY);
+    if (event.pointerType === "touch") pointer.targetActive = 0;
+    pointerDown = null;
+  });
+  stage.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") { event.preventDefault(); sendPulse(); }
+  });
   motionToggle.addEventListener("click", () => {
     paused = !paused;
     motionToggle.querySelector(".motion-label").textContent = paused ? "Resume animation" : "Pause animation";
     motionToggle.querySelector(".motion-icon").textContent = paused ? "▷" : "Ⅱ";
     syncAnimation();
   });
-  document.addEventListener("visibilitychange", () => { pointerActive = 0; syncAnimation(); });
+  document.addEventListener("visibilitychange", () => { pointer.targetActive = 0; syncAnimation(); });
   reduceMotion.addEventListener("change", syncAnimation);
   canvas.addEventListener("webglcontextlost", event => {
     event.preventDefault();
@@ -270,12 +301,8 @@
     stage.classList.remove("is-ready");
     motionToggle.hidden = true;
   });
-  // Keep the readable heading if graphics resources are unavailable or lost.
   if ("ResizeObserver" in window) {
-    new ResizeObserver(() => {
-      cancelAnimationFrame(resizeFrame);
-      resizeFrame = requestAnimationFrame(resize);
-    }).observe(stage);
+    new ResizeObserver(() => { cancelAnimationFrame(resizeFrame); resizeFrame = requestAnimationFrame(resize); }).observe(stage);
   } else window.addEventListener("resize", resize);
   if ("IntersectionObserver" in window) {
     new IntersectionObserver(entries => { visible = entries[0].isIntersecting; syncAnimation(); }, { threshold: 0 }).observe(stage);

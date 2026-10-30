@@ -1,43 +1,43 @@
-# MXI
+# MXI: Mathematics x Intelligence
 
-MXI: **Mathematics x Intelligence**. An English-only team homepage, built for GitHub Pages with plain HTML, CSS, JavaScript, and WebGL. No dependency installation or build step is required.
+A single-screen, English-only homepage: **https://mxiteam.github.io/**.
 
-## Local preview
+The page contains the supplied GitHub avatar, a stationary volumetric MXI sculpture built from luminous binary digits, the brand meaning, and:
 
-From the repository root:
+> Exploring intelligence that perceives, reasons, predicts, and acts.
+
+There are no About, Research, project, or secondary navigation sections.
+
+## Animation
+
+The camera is fixed. Front, back, and side layers provide depth while a per-depth letter mask keeps the MXI silhouette stable. Only the internal 0/1 field moves. It blends streaming digits, fine connections, and traveling waves without mode buttons.
+
+Move the cursor to bend a local field; click or tap to launch an energy wave. Focus the sculpture and press Enter or Space for the same action. Pause/resume is keyboard accessible. Animation suspends in hidden tabs, offscreen, and for reduced-motion preferences. A readable MXI heading remains when graphics are unavailable.
+
+All assets, shaders, binary glyphs, and geometry are local. No dependencies, external fonts, analytics, or build step are required.
+
+## Source
+
+- `index.html`: the single-screen composition and metadata.
+- `styles.css`: black-and-silver responsive design and short-height layout.
+- `particle-shaders.js`: procedural binary glyphs, fixed oblique projection and inverse masks, local fields, pulses, and lighting.
+- `particles.js`: geometry, graph connections, input, animation lifecycle, and WebGL rendering.
+- `assets/mxi-logo.png`: the avatar supplied by the owner.
+
+## Preview and publish
 
 ```sh
 python3 -m http.server 8768 --bind 127.0.0.1
 ```
 
-Open <http://127.0.0.1:8768>. Stop the server with Ctrl+C. Refresh the page after changing source files.
+Open <http://127.0.0.1:8768/> and refresh after source changes.
 
-## Content and design
-
-- `index.html`: English content, accessible navigation, metadata, and a readable MXI heading.
-- `styles.css`: black and silver visual design, responsive layout, focus states, and reduced-motion styles.
-- `script.js`: mobile navigation, active-section indicators, and the current year.
-- `particles.js`: locally generated, volumetric silver-white MXI lettering made from readable 0/1 glyphs, with automatic rotation, flowing digits, scatter/reassembly, cursor interaction, and a pause/resume control.
-- `assets/mxi-logo.png`: the avatar supplied by the site owner, downloaded from the MXITeam GitHub avatar on 2026-10-30.
-
-The brand is **MXI**, expanded exactly as **Mathematics x Intelligence**. The page title, hero tagline, introduction, and footer use this meaning. All published copy is English. The particle aesthetic follows the owner's reference: silver-white glyphs with visible depth on black. Each particle is a procedurally drawn 0 or 1; glyph sizes and density preserve legibility, and digits change over time. No external font texture is required. Motion starts automatically; pause/resume is available in the hero. Animation stops offscreen, in hidden tabs, and for a reduced-motion preference. The semantic MXI heading remains readable if WebGL is unavailable. The illustration does not claim a demonstration or measured result.
-
-Research descriptions express interests and engineering approaches. The site does not claim benchmark results or list unconfirmed team members. The public project description is based on [EmbodiedAI-Demo-Pipeline's README](https://github.com/MXITeam/EmbodiedAI-Demo-Pipeline#readme). Private organization repositories are not listed.
-
-## GitHub Pages
-
-The site is ready to publish directly from the root of `main`. In repository **Settings → Pages**, choose **Deploy from a branch**, `main`, `/ (root)`. `.nojekyll` disables unnecessary Jekyll processing. The intended URL is <https://mxiteam.github.io/>.
-
-The owner chose to keep the repository private and use a local preview. GitHub Pages returned HTTP 422 because private organization repositories are not supported on the current GitHub Free plan. No public site was deployed and repository visibility remains unchanged. Do not change visibility without new owner authorization.
-
-For a future custom domain, update the canonical URL, Open Graph URL/image, `robots.txt`, and `sitemap.xml` together.
-
-## Checks
+The owner authorized making this homepage repository public and deploying with GitHub Pages. Pages serves the root of `main` at <https://mxiteam.github.io/>. `.nojekyll` avoids unnecessary processing. Push verified changes to `main` to update the site.
 
 ```sh
-node --check script.js
 node --check particles.js
+node --check particle-shaders.js
 git diff --check
 ```
 
-Acceptance covers automatic particle movement, pause/resume, reduced motion, offscreen/hidden-tab suspension, mobile navigation and Escape, research accordions, local assets and anchors, English-only copy, and a readable heading when graphics are unavailable. See `docs/verification.md` for the actual checks and limits of this delivery.
+See `docs/verification.md` for verification evidence and limits.
