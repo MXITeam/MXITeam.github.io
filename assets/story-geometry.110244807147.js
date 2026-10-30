@@ -90,10 +90,35 @@ window.MXIStoryTargets=(()=>{
     return s.parts;
   }
   function cosmos(){
-    const s=scene(),tilt=p=>[p[0]*.9-p[1]*.43,p[0]*.43+p[1]*.9,p[2]];
-    s.part(6,(u,v)=>{const a=v*TAU,r=.31+Math.pow(u,.8)*.64,z=Math.sin(a)*r*.68,y=Math.sin(a)*r*.3+(hash(u*998+v*13)-.5)*.022;return [...tilt([Math.cos(a)*r,y,z]),.13+Math.exp(-Math.pow(r-.38,2)/.009)*.8+.15*(1-u)];});
-    s.part(2.4,(u,v)=>{const a=u*TAU,b=v*TAU,r=.342+.012*Math.cos(b);return [...tilt([Math.cos(a)*r,Math.sin(a)*r*.48+.008*Math.sin(b),Math.sin(a)*r*.7]),.95];});
-    for(let k=0;k<32;k++){const angle=hash(k)*TAU,r=1+hash(k+20)*.9,a=[Math.cos(angle)*.72,Math.sin(angle)*.67,(hash(k+5)-.5)*.9],b=[Math.cos(angle+.4)*r,Math.sin(angle+.4)*r*.85,(hash(k+9)-.5)*1.7];s.cable([a,mix(a,b,.35),add(b,[.16*Math.sin(k),.17*Math.cos(k),.12]),b],.0025,.065,.25+hash(k+71)*.5);if(k%3===0)s.ellipsoid(b,[.022,.014,.018],.025,.9);}
+    const s=scene(),tilt=p=>[p[0]*.9-p[1]*.435,p[0]*.435+p[1]*.9,p[2]];
+    // A circular disk in 3D, with a genuine central opening and vertical thickness.
+    s.part(6,(u,v)=>{
+      const a=v*TAU,r=.32+Math.pow(u,1.8)*.72;
+      const thickness=(hash(u*996+v*311)-.5)*.018*(1+u*2);
+      const filament=.72+.28*Math.sin(a*19+r*55);
+      return [...tilt([Math.cos(a)*r,Math.sin(a)*r*.5+thickness,Math.sin(a)*r*.866]),(.12+Math.exp(-Math.pow(r-.39,2)/.013)*.62)*filament];
+    });
+    s.part(1.7,(u,v)=>{const a=u*TAU,b=v*TAU,r=.335+.007*Math.cos(b);return [...tilt([Math.cos(a)*r,Math.sin(a)*r*.5+.007*Math.sin(b),Math.sin(a)*r*.866]),.92];});
+    // Lensed rear light arches over the shadow instead of flattening onto it.
+    s.part(.9,(u,v)=>{const a=u*Math.PI,r=.31+(v-.5)*.016;return [Math.cos(a)*r,.05+Math.sin(a)*.33,-.21+.018*Math.sin(a*5),.55+.35*Math.sin(a)];});
+    const nodes=[];
+    for(let k=0;k<54;k++){
+      const a=k*2.3999632297,r=1.05+hash(k+60)*1.7;
+      const p=[Math.cos(a)*r,Math.sin(a)*r*.78,(hash(k+12)-.5)*1.7];nodes.push(p);
+      s.ellipsoid(p,[.009,.009,.009],.017,.8);
+      if(k%5===0)s.ring(p,[hash(k+11)-.5,hash(k+15),.8],.035+hash(k+91)*.04,.002,.035,.5);
+    }
+    nodes.forEach((a,i)=>{
+      const neighbors=nodes.map((b,j)=>({b,j,d:Math.hypot(...sub(a,b))})).filter(n=>n.j>i&&n.d<1.9).sort((a,b)=>a.d-b.d).slice(0,3);
+      neighbors.forEach(({b,j,d})=>{
+        for(let strand=0;strand<3;strand++){
+          const offset=.018*(strand-1),middle=mix(a,b,.5);
+          s.cable([a,add(mix(a,b,.3),[.08*Math.sin(i+j),offset,.12*Math.cos(i)]),add(middle,[offset,.1*Math.cos(j),-.15*Math.sin(j)]),b],.0015,.014*(2-d/2),.1+hash(i*71+j)*.28);
+        }
+      });
+    });
+    // Distant binary stardust occupies a broad volume rather than a rectangle.
+    s.part(1.4,(u,v)=>{const a=v*TAU,r=1.1+u*1.75;return [Math.cos(a)*r,Math.sin(a)*r*.8,(hash(u*9999+v*32)-.5)*1.9,.018+hash(u*991+v*191)*.12];});
     return s.parts;
   }
   const definitions=[mathematics(),mechanics(),robot(),brain(),cosmos()];
@@ -119,11 +144,12 @@ window.MXIStoryTargets=(()=>{
   }
   // Recursive spatial quantiles keep local neighborhoods together in each body.
   function spatialOrder(points,axis=0){if(points.length<=12)return points.sort((a,b)=>a[axis]-b[axis]);points.sort((a,b)=>a[axis]-b[axis]);const middle=points.length>>>1;return spatialOrder(points.slice(0,middle),(axis+1)%3).concat(spatialOrder(points.slice(middle),(axis+1)%3));}
+  function buildScene(act,count){const parts=definitions[act],sum=parts.reduce((n,p)=>n+p.weight,0),points=[];let partIndex=0,boundary=parts[0].weight;for(let i=0;i<count;i++){const q=(i+.5)/count*sum;while(q>boundary&&partIndex<parts.length-1)boundary+=parts[++partIndex].weight;points.push(parts[partIndex].sample(hash(i*3+1),hash(i*3+2)));}return new Float32Array(spatialOrder(points).flat());}
   function build(count){
-    const bodies=definitions.map(parts=>{const sum=parts.reduce((n,p)=>n+p.weight,0),points=[];let partIndex=0,boundary=parts[0].weight;for(let i=0;i<count;i++){const q=(i+.5)/count*sum;while(q>boundary&&partIndex<parts.length-1)boundary+=parts[++partIndex].weight;points.push(parts[partIndex].sample(hash(i*3+1),hash(i*3+2)));}return new Float32Array(spatialOrder(points).flat());});
+    const bodies=definitions.map((_,act)=>buildScene(act,count));
     const chain=new Float32Array(count*4);for(let i=0;i<count;i++)chain.set([(i/count-.5)*7,0,0,0],i*4);
     return [chain,...bodies,wordmark(count)];
   }
   function bookends(count){const empty=()=>new Float32Array(count*4),chain=empty();for(let i=0;i<count;i++)chain.set([(i/count-.5)*7,0,0,0],i*4);return [chain,empty(),empty(),empty(),empty(),empty(),wordmark(count)];}
-  return Object.freeze({ready:Promise.resolve(true),build,bookends,spatialOrder});
+  return Object.freeze({ready:Promise.resolve(true),build,buildScene,bookends,spatialOrder});
 })();

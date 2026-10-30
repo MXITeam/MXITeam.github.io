@@ -14,12 +14,17 @@
   <meta property="og:image" content="https://mxiteam.github.io/assets/mxi-logo.png">
   <meta name="twitter:card" content="summary">
   <link rel="icon" href="./assets/mxi-logo.png" type="image/png">
-  <link rel="stylesheet" href="./assets/styles.6fdd2d1f0ee0.css">
-  <script src="./assets/story-shapes.3491faf72fb8.js" defer></script>
-  <script src="./assets/story-geometry.65441200ec09.js" defer></script>
-  <script src="./assets/story-targets.fe6bcfe968dc.js" defer></script>
-  <script src="./assets/story-shaders.ee61b6a4b307.js" defer></script>
-  <script src="./assets/story.c9584d09e2a0.js" defer></script>
+  <link rel="stylesheet" href="./assets/styles.fb64e40638ad.css">
+  <script src="./assets/story-shapes.206c5630c1ee.js" defer></script>
+  <script src="./assets/story-geometry.110244807147.js" defer></script>
+  <script src="./assets/brain-surface.cc390f15104c.js" defer></script>
+  <script src="./assets/story-targets.6e5afa1dbf04.js" defer></script>
+  <script src="./assets/math-detail.5b30b34e5e4f.js" defer></script>
+  <script src="./assets/math-field.5cf3c17d4778.js" defer></script>
+  <script src="./assets/math-flow.3c6e560e7f46.js" defer></script>
+  <script src="./assets/scene-layers.15e616e09166.js" defer></script>
+  <script src="./assets/story-shaders.f1d3d427f70d.js" defer></script>
+  <script src="./assets/story.76bdbe1c4573.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to main content</a>
@@ -27,6 +32,7 @@
     <div class="container header-inner">
       <a class="brand" href="./" aria-label="MXI: Mathematics x Intelligence">
         <img src="./assets/mxi-logo.png" width="42" height="42" alt="" fetchpriority="high">
+        <span class="brand-separator" aria-hidden="true">·</span>
         <span>MXI</span>
       </a>
       <a class="header-github" href="https://github.com/MXITeam" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
@@ -34,22 +40,22 @@
   </header>
   <main id="main" class="hero container">
     <h1 class="sr-only">MXI: Mathematics x Intelligence</h1>
-    <div class="story-stage" id="story-stage" role="group" tabindex="0" aria-label="A continuous three-dimensional binary story: 1011, mathematics, mechanics, life, mind, universe, and MXI" aria-describedby="field-help">
+    <div class="story-stage" id="story-stage" role="group" tabindex="0" aria-label="A continuous binary story: 1011, mathematics, robot, brain, universe, and MXI" aria-describedby="field-help">
       <div class="story-fallback" aria-hidden="true">MXI</div>
       <canvas id="story-particles" aria-hidden="true"></canvas>
       <canvas id="story-conduit" aria-hidden="true"></canvas>
     </div>
     <p class="hero-tagline">Mathematics x Intelligence</p>
     <nav class="scene-navigation" aria-label="Animation scenes">
-      <button type="button" data-scene="0" aria-current="step">1011</button>
-      <button type="button" data-scene="1">Mathematics</button>
-      <button type="button" data-scene="2">Mechanics</button>
-      <button type="button" data-scene="3">Robot</button>
-      <button type="button" data-scene="4">Brain</button>
-      <button type="button" data-scene="5">Universe</button>
-      <button type="button" data-scene="6">MXI</button>
+      <button type="button" data-scene="0" aria-label="01 / I — Binary" aria-current="step">01 <span aria-hidden="true">I</span></button>
+      <button type="button" data-scene="1" aria-label="02 / II — Mathematics">02 <span aria-hidden="true">II</span></button>
+      <button type="button" data-scene="3" aria-label="03 / III — Robot">03 <span aria-hidden="true">III</span></button>
+      <button type="button" data-scene="4" aria-label="04 / IV — Brain">04 <span aria-hidden="true">IV</span></button>
+      <button type="button" data-scene="5" aria-label="05 / V — Universe">05 <span aria-hidden="true">V</span></button>
+      <span class="scene-ellipsis" aria-hidden="true">…</span>
+      <button type="button" data-scene="6" aria-label="1011 — MXI">1011 <span aria-hidden="true">MXI</span></button>
     </nav>
-    <p id="field-help" class="sr-only">The central 1011 leads a continuous binary chain through mathematics, a mechanical arm, a humanoid robot, a brain, and the universe, finally forming MXI. Choose a scene below to jump to it. Press Enter for a wave, or Space to pause and resume. Reduced motion shows a static scene.</p>
+    <p id="field-help" class="sr-only">The central 1011 leads a continuous binary chain through mathematics, a humanoid robot, a brain, and the universe, finally forming MXI. Choose a numbered scene below to jump to it. Press Enter for a wave, or Space to pause and resume. Reduced motion shows a static scene.</p>
   </main>
 </body>
 </html>

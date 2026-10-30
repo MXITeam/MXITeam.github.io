@@ -1,0 +1,11 @@
+{
+  "source": "Nilearn fsaverage5 pial_left/pial_right + sulc",
+  "source_url": "https://github.com/nilearn/nilearn/tree/main/nilearn/datasets/data/fsaverage5",
+  "vertices": 20484,
+  "triangles": 40960,
+  "particles": 50000,
+  "bytes": 800000,
+  "asset": "assets/brain-surface.2c9c436c0a42.bin",
+  "mesh_asset": "assets/brain-mesh.c8fa560d2a38.bin",
+  "mesh_bytes": 573512
+}

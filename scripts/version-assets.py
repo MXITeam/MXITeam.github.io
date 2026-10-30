@@ -9,7 +9,7 @@ assets = root / 'assets'
 assets.mkdir(exist_ok=True)
 page = root / 'index.html'
 html = page.read_text()
-for filename in ('styles.css', 'story-shapes.js', 'story-geometry.js', 'story-targets.js', 'story-shaders.js', 'story.js'):
+for filename in ('styles.css', 'story-shapes.js', 'story-geometry.js', 'brain-surface.js', 'story-targets.js', 'math-detail.js', 'math-field.js', 'math-flow.js', 'scene-layers.js', 'story-shaders.js', 'story.js'):
     source = root / filename
     data = source.read_bytes()
     digest = hashlib.sha256(data).hexdigest()[:12]
