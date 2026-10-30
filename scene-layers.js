@@ -23,7 +23,8 @@ window.MXIStoryLayers = Object.freeze({
         if(scene!==scenes[options.state.from-1])return;
         const withdraw=Math.max(0,1-options.state.progress/.22);
         const draw={...options,opacity:weight**3*reveal*withdraw*withdraw};
-        scene.detail?.draw(draw);scene.field?.draw({...draw,opacity:draw.opacity*.65});
+        scene.detail?.draw({...options,opacity:reveal,progress:options.state.progress});
+        scene.field?.draw({...draw,opacity:draw.opacity*.65});
       });},
       drawFlow(options){each(options.state,(scene,weight)=>{
         if(scene!==scenes[options.state.from-1])return;

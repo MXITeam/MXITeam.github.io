@@ -12,6 +12,7 @@ window.MXIMathDetail = (() => {
     uniform vec3 u_camera;
     uniform float u_size;
     varying mediump vec2 v_uv;
+    varying mediump float v_sourceRank;
     void main() {
       vec3 p=a_position;
       p=vec3(cos(u_view.x)*p.x+sin(u_view.x)*p.z,p.y,-sin(u_view.x)*p.x+cos(u_view.x)*p.z);
@@ -20,6 +21,7 @@ window.MXIMathDetail = (() => {
       vec2 screen=(p.xy-u_camera.xy)*u_size*u_camera.z*perspective;
       gl_Position=vec4(screen/(u_resolution*.5),clamp(-p.z*.2,-.9,.9),1.);
       v_uv=a_uv;
+      v_sourceRank=clamp(screen.x/(u_size*1.5)+.5,0.,1.);
     }
   `;
   const fragment = `
@@ -31,7 +33,9 @@ window.MXIMathDetail = (() => {
     uniform float u_neural;
     uniform float u_robot;
     uniform float u_universe;
+    uniform float u_progress;
     varying mediump vec2 v_uv;
+    varying mediump float v_sourceRank;
     void main() {
       float light=texture2D(u_source,v_uv).r;
       if(light<.025)discard;
@@ -70,7 +74,10 @@ window.MXIMathDetail = (() => {
       // without filling the dark event horizon or lighting the crop edges.
       float diskPulse=.55+.30*smoothstep(-.5,.8,sin(u_time*.65+v_uv.x*4.-v_uv.y*3.));
       alpha+=u_universe*pow(ridge,.65)*diskPulse*u_opacity;
-      gl_FragColor=vec4(.94,.97,1.,alpha);
+      // Retire the reference ridges with the same left-to-right wave as the
+      // outgoing particles, instead of fading the whole image at once.
+      float withdrawal=1.-smoothstep(v_sourceRank*.22,v_sourceRank*.22+.22,u_progress);
+      gl_FragColor=vec4(.94,.97,1.,alpha*withdrawal);
     }
   `;
 
@@ -126,8 +133,8 @@ window.MXIMathDetail = (() => {
     gl.texImage2D(gl.TEXTURE_2D,0,gl.LUMINANCE,width,height,0,gl.LUMINANCE,gl.UNSIGNED_BYTE,luminance);
     gl.pixelStorei(gl.UNPACK_ALIGNMENT,4);
     const attributes=[gl.getAttribLocation(program,"a_position"),gl.getAttribLocation(program,"a_uv")];
-    const uniforms=Object.fromEntries(["resolution","view","camera","size","source","texel","opacity","time","neural","robot","universe"].map(name=>[name,gl.getUniformLocation(program,"u_"+name)]));
-    return Object.freeze({draw({width,height,view,camera,size,opacity,time=0}){
+    const uniforms=Object.fromEntries(["resolution","view","camera","size","source","texel","opacity","time","neural","robot","universe","progress"].map(name=>[name,gl.getUniformLocation(program,"u_"+name)]));
+    return Object.freeze({draw({width,height,view,camera,size,opacity,time=0,progress=0}){
       if(opacity<.002)return;
       gl.useProgram(program);gl.disable(gl.DEPTH_TEST);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE);
       gl.bindBuffer(gl.ARRAY_BUFFER,buffer);
@@ -141,6 +148,7 @@ window.MXIMathDetail = (() => {
       gl.uniform1f(uniforms.neural,surface.act===3?1:0);
       gl.uniform1f(uniforms.robot,surface.act===2?1:0);
       gl.uniform1f(uniforms.universe,surface.act===4?1:0);
+      gl.uniform1f(uniforms.progress,progress);
       gl.drawArrays(gl.TRIANGLES,0,vertices.length/5);
       gl.disable(gl.BLEND);
     }});
