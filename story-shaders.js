@@ -85,6 +85,13 @@ window.MXIStoryShaders=Object.freeze({
       float bodyAlpha=clamp(mix(a_from.w,a_to.w,k)*flicker*a_traits.z*depthLight*1.35,0.,1.);
       float streamAlpha=.32*(1.-smoothstep(.18,.5,abs(strandOffset)));
       v_alpha=mix(bodyAlpha,streamAlpha,stream);
+      // Ribbon coordinates wrap outside the viewport. While a particle is
+      // travelling to or from that ribbon, interpolation can bring the wrap
+      // back onscreen; fade it at the seam to prevent a visible cross-screen jump.
+      float seamDistance=.8-abs(ribbonX/u_resolution.x);
+      float seamFade=smoothstep(0.,.16,seamDistance);
+      float moving=max(stream,max(4.*retreat*(1.-retreat),4.*emerge*(1.-emerge)));
+      v_alpha*=mix(1.,seamFade,moving);
       v_digit=step(.5,fract(seed*.27+floor(u_time*.3+seed)*.618));
     }
   `,
