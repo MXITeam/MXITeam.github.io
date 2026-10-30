@@ -14,7 +14,7 @@
   <meta property="og:image" content="https://mxiteam.github.io/assets/mxi-logo.png">
   <meta name="twitter:card" content="summary">
   <link rel="icon" href="./assets/mxi-logo.png" type="image/png">
-  <link rel="stylesheet" href="./assets/styles.6ac3cf7b3a1d.css">
+  <link rel="stylesheet" href="./assets/styles.bf632afb9d05.css">
   <script src="./assets/story-shapes.206c5630c1ee.js" defer></script>
   <script src="./assets/story-geometry.110244807147.js" defer></script>
   <script src="./assets/brain-surface.cc390f15104c.js" defer></script>
@@ -24,7 +24,7 @@
   <script src="./assets/math-flow.3c6e560e7f46.js" defer></script>
   <script src="./assets/scene-layers.15e616e09166.js" defer></script>
   <script src="./assets/story-shaders.f1d3d427f70d.js" defer></script>
-  <script src="./assets/story.76bdbe1c4573.js" defer></script>
+  <script src="./assets/story.cdda126e6fd4.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to main content</a>
@@ -36,8 +36,14 @@
         <span>MXI</span>
       </a>
       <div class="header-actions">
-        <a class="header-research" href="#projects">Projects</a>
-        <a class="header-github" href="https://github.com/MXITeam" target="_blank" rel="noopener noreferrer">Open Source <span aria-hidden="true">↗</span></a>
+        <a class="header-research" href="#projects">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true" focusable="false"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+          Projects
+        </a>
+        <a class="header-github" href="https://github.com/MXITeam" target="_blank" rel="noopener noreferrer">
+          <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82a7.65 7.65 0 0 1 4 0c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+          Open Source <span aria-hidden="true">↗</span>
+        </a>
       </div>
     </div>
   </header>
@@ -49,7 +55,6 @@
       <canvas id="story-particles" aria-hidden="true"></canvas>
       <canvas id="story-conduit" aria-hidden="true"></canvas>
     </div>
-    <p class="hero-tagline">Mathematics x Intelligence</p>
     <nav class="scene-navigation" aria-label="Animation scenes">
       <button type="button" data-scene="0" aria-label="01 / I — Binary" aria-current="step">01 <span aria-hidden="true">I</span></button>
       <button type="button" data-scene="1" aria-label="02 / II — Mathematics">02 <span aria-hidden="true">II</span></button>
@@ -65,17 +70,17 @@
       <h2 id="projects-title">Projects</h2>
       <div class="research-grid">
         <article class="research-project" aria-labelledby="project-mxi0">
-          <span class="project-number" aria-hidden="true">01</span>
+          <svg class="project-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="3"/><circle cx="4" cy="4" r="2"/><circle cx="20" cy="4" r="2"/><circle cx="4" cy="20" r="2"/><circle cx="20" cy="20" r="2"/><path d="m5.5 5.5 4.4 4.4m4.2 0 4.4-4.4m-13 13 4.4-4.4m4.2 0 4.4 4.4"/></svg>
           <div class="project-heading"><h3 id="project-mxi0">MXI v0</h3><span class="project-status">[Preview]</span></div>
           <p>Perception, Memory, Prediction, Action</p>
         </article>
         <article class="research-project" aria-labelledby="project-icl">
-          <span class="project-number" aria-hidden="true">02</span>
+          <svg class="project-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="8" width="14" height="12" rx="3"/><path d="M12 5v3M2 12v4m20-4v4M9 17h6"/><circle cx="12" cy="3" r="2"/><path d="M9 12v1m6-1v1"/></svg>
           <div class="project-heading"><h3 id="project-icl">MXI RoboICL</h3></div>
           <p>In-Context Learning on Robotics</p>
         </article>
         <article class="research-project" aria-labelledby="project-simworld">
-          <span class="project-number" aria-hidden="true">03</span>
+          <svg class="project-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m12 2 9 5v10l-9 5-9-5V7l9-5Zm0 10L3 7m9 5 9-5m-9 5v10"/></svg>
           <div class="project-heading"><h3 id="project-simworld">MXI SimWorld</h3></div>
           <p>Simulating World as Policy</p>
         </article>

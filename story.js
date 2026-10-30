@@ -5,7 +5,6 @@
   const canvas=document.querySelector("#story-particles");
   const foreground=document.querySelector("#story-conduit");
   const shapes=window.MXIStoryShapes, targets=window.MXIStoryTargets, shaders=window.MXIStoryShaders;
-  const tagline=document.querySelector(".hero-tagline");
   const sceneButtons=Array.from(document.querySelectorAll?.("[data-scene]")||[]);
   if(!stage||!canvas||!foreground||!shapes||!targets||!shaders)return;
   await targets.ready;
@@ -225,7 +224,6 @@
     const volume=sceneLayers?0:(state.from===4||state.from===5?1-state.mix:0)+(state.to===4||state.to===5?state.mix:0);
     view=[(-.34+Math.sin(t*.095)*(.10+volume*.3))*active-.26*endWeight,(.12+Math.sin(t*.07)*(.045+volume*.09))*active+.085*endWeight];
     objectSize=size*(1+endWeight*.65+active*.12);
-    if(tagline)tagline.style.opacity=String(endWeight);
     const current=state.mix>.5?state.to:state.from;
     sceneButtons.forEach(button=>button.setAttribute("aria-current",Number(button.dataset.scene)===current?"step":"false"));
     // The compass and topology need several times the samples of a solid wordmark.

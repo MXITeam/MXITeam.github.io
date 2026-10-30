@@ -42,11 +42,11 @@
 
 - 品牌：`MXI`；含义：`MXI: Mathematics x Intelligence`。
 - 原 Logo：`assets/mxi-logo.png`，来自团队 GitHub 头像，保留；它与页头 MXI 之间用一个居中点分隔。
-- 页面保留精简页头、主视觉、编号导航，以及最终的 `Mathematics x Intelligence` 字样；页头与动画区总高度为 `88svh`，给下方内容留出空间。右上角为 Projects 锚点和 Open Source 外链（链接到团队 GitHub）。
+- 页面保留精简页头、主视觉和编号导航；MXI 末幕不显示下方标语；动画高度随屏幕调整，为下方 Projects 标题和第一个项目预留约 300px，尽量在首屏露出 MXI v0。右上角为带四格图标的 Projects 锚点和带 GitHub 图标的 Open Source 外链（链接到团队 GitHub）。
 - 全站只写英文。与我沟通、交付说明可以使用中文。
 - 背景纯黑，主体由银白色 **0 和 1** 构成。避免彩虹色、大面积彩色背景、发光雾团和过度 bloom。
 - 数学公式等少量文字可以使用手写体，不必全做成粒子。
-- 最新要求：主视觉下方增加 Projects 区域，三个项目上下纵向排列，桌面每行左侧标题、右侧说明，手机说明位于标题下方。项目依次为 `MXI v0 [Preview]` / `Perception, Memory, Prediction, Action`，`MXI RoboICL` / `In-Context Learning on Robotics`，`MXI SimWorld` / `Simulating World as Policy`。保持黑底银白字，不添加未经提供的项目链接、成果或介绍。
+- 最新要求：主视觉下方增加 Projects 区域，三个项目上下纵向排列，桌面每行左侧标题、右侧说明，手机说明位于标题下方。项目依次为 `MXI v0 [Preview]` / `Perception, Memory, Prediction, Action`，`MXI RoboICL` / `In-Context Learning on Robotics`，`MXI SimWorld` / `Simulating World as Policy`。项目不使用数字编号，分别用神经网络、机器人、立方体的银白线条图标。保持黑底银白字，不添加未经提供的项目链接、成果或介绍。
 - 不恢复已删除的标语：`MATHEMATICS IN MOTION`、`PERCEIVE / REASON / PREDICT / ACT`、`Exploring intelligence...`、`Move to bend the field...`。
 - 不增加 Flow、Network、Wave、Animation、Pause 等可见控制按钮。**用户后来要求的编号导航要保留，前五项显示 01–05 和 I–V，最后显示 1011 MXI。**
 - 旧的“左侧固定 MXI、右侧循环图形”构图已被后续要求替代。现在是一个完整的、居中的、左右无边框的全幅序列。
