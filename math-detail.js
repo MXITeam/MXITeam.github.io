@@ -56,7 +56,7 @@ window.MXIMathDetail = (() => {
       // Face and shell features are much finer than the shortened particle
       // field. Reinforce only source-image ridges in that area; no solid image
       // fill is added and the existing edge envelope still controls the crop.
-      float face=u_robot*smoothstep(.27,.40,v_uv.x)*(1.-smoothstep(.86,.98,v_uv.x))
+      float face=u_robot*smoothstep(.351,.467,v_uv.x)*(1.-smoothstep(.876,.982,v_uv.x))
         *smoothstep(.10,.20,v_uv.y)*(1.-smoothstep(.62,.72,v_uv.y));
       float faceRidge=(pow(ridge,.7)*.55+smoothstep(.05,.2,ridge)*.10
         +pow(darkRidge,.8)*.22)
@@ -67,6 +67,11 @@ window.MXIMathDetail = (() => {
       // after the binary particles have formed.
       float faceTone=pow(light,1.5)*.85;
       alpha+=face*(faceRidge+faceTone)*u_opacity;
+      // The raised fingers and floating zero occupy the left of the wider
+      // crop. Preserve their source highlights while leaving dark gaps open.
+      float hand=u_robot*smoothstep(.06,.12,v_uv.x)*(1.-smoothstep(.34,.40,v_uv.x))
+        *smoothstep(.07,.13,v_uv.y)*(1.-smoothstep(.65,.75,v_uv.y));
+      alpha+=hand*(pow(light,1.5)*.8+pow(ridge,.7)*.35)*u_opacity;
       // Retain the folds of the brain at small sizes, without brightening the
       // sparse neural branches on the right or drawing the source rectangle.
       float cortex=u_neural*(1.-smoothstep(.38,.55,v_uv.x));

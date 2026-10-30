@@ -24,7 +24,8 @@ window.MXIStoryReference = (() => {
         canvas.height = Math.round(image.naturalHeight * 384 / (image.naturalWidth / 5));
         const context = canvas.getContext("2d", { willReadFrequently: true });
         if (!context) { resolve(false); return; }
-        const crops=[[0,.2],[.2,.4],[.4,.6],[.58,.8],[.765,1]];
+        // Include the raised fingertips just left of the original panel edge.
+        const crops=[[0,.2],[.2,.4],[.375,.6],[.58,.8],[.765,1]];
         for (let act = 0; act < 5; act++) {
           const [start,end]=crops[act],sourceWidth=image.naturalWidth*(end-start);
           canvas.width=Math.round(sourceWidth);
@@ -35,7 +36,7 @@ window.MXIStoryReference = (() => {
           if(act===2){
             // The shared five-panel reference overlaps here: this isolated patch
             // is the next panel's cortex, not part of the android's head or ear.
-            for(let y=Math.floor(canvas.height*.24);y<Math.ceil(canvas.height*.65);y++)for(let x=Math.floor(canvas.width*.91);x<canvas.width;x++){
+            for(let y=Math.floor(canvas.height*.24);y<Math.ceil(canvas.height*.65);y++)for(let x=Math.floor(canvas.width*.92);x<canvas.width;x++){
               const p=(y*canvas.width+x)*4;pixels[p]=pixels[p+1]=pixels[p+2]=pixels[p+3]=0;
             }
           }
@@ -136,7 +137,7 @@ window.MXIStoryReference = (() => {
         // leaves the hand, neck and the other scenes' particle density intact.
         if(act===2){
           const u=panel.points[low*3]/(panel.width-1),v=panel.points[low*3+1]/(panel.height-1);
-          const face=fade((u-.26)/.12)*fade((.87-u)/.12)*fade((v-.16)/.08)*fade((.62-v)/.08);
+          const face=fade((u-.342)/.107)*fade((.884-u)/.107)*fade((v-.16)/.08)*fade((.62-v)/.08);
           const contrast=.30+1.2*fade((light-.13)/.55);
           alpha*=1+face*(contrast-1);
         }
