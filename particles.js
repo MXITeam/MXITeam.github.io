@@ -1,9 +1,10 @@
 "use strict";
 
-(() => {
+(async () => {
   const stage = document.querySelector("#particle-stage");
   const canvas = document.querySelector("#mxi-particles");
   if (!stage || !canvas || !window.MXIShapes || !window.MXIParticleShaders) return;
+  const referenceActive = Boolean(window.MXIReference && await window.MXIReference.ready);
   const gl = canvas.getContext("webgl", { alpha: false, antialias: false, powerPreference: "low-power" });
   if (!gl) return;
   const mask = document.createElement("canvas");
@@ -102,7 +103,7 @@
     gl.uniform1f(uniforms.echo, 0);
     gl.uniform1f(uniforms.glowPass, 0);
     gl.uniform1f(uniforms.linePass, 1);
-    gl.uniform1f(uniforms.lineOpacity, (.018 + modes[1] * .16 + modes[2] * .025) * shapes[0]);
+    gl.uniform1f(uniforms.lineOpacity, (.006 + modes[1] * .025) * shapes[0]);
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, edgeBuffer);
     gl.drawElements(gl.LINES, edgeCount, gl.UNSIGNED_SHORT, 0);
     if (brainEdgeCount && shapes[2] > .001) {
@@ -110,8 +111,8 @@
       gl.drawElements(gl.LINES, brainEdgeCount, gl.UNSIGNED_SHORT, edgeCount * 2);
     }
     gl.uniform1f(uniforms.linePass, 0);
-    if (!reduceMotion.matches) {
-      [.18, .08].forEach(delay => {
+    if (!reduceMotion.matches && shapes.some(value => value > .001 && value < .999)) {
+      [.08].forEach(delay => {
         gl.uniform1f(uniforms.echo, delay);
         gl.uniform4fv(uniforms.shapes, window.MXIShapes.weights(Math.max(0, shapeTime - delay)));
         gl.drawArrays(gl.POINTS, 0, count);
@@ -254,8 +255,8 @@
     const bottom = Math.min(height - 1, baseline + metrics.actualBoundingBoxDescent);
     const left = Math.max(0, (width - metrics.width) / 2);
     const right = Math.min(width - 1, left + metrics.width);
-    const gap = width < 700 ? 6 : 9;
-    const depth = fontSize * .32;
+    const gap = 3;
+    const depth = fontSize * .13;
     const pixels = maskContext.getImageData(0, 0, width, height).data;
     const alphaAt = (x, y) => x < 0 || y < 0 || x >= width || y >= height ? 0 : pixels[(Math.floor(y) * width + Math.floor(x)) * 4 + 3];
     const candidates = [];
@@ -263,7 +264,7 @@
       if (alphaAt(x, y) < 160) continue;
       const px = x - width / 2 + (Math.random() - .5) * 1.5;
       const py = height / 2 - y;
-      const size = width < 700 ? 8 + Math.random() * 1.5 : 11 + Math.random() * 2;
+      const size = 7.0 + Math.random() * 1.5;
       candidates.push([px, py, depth / 2, size, Math.random() * Math.PI * 2, .78 + Math.random() * .22, 1]);
       candidates.push([px, py, -depth / 2, size * .8, Math.random() * Math.PI * 2, .22 + Math.random() * .12, 1]);
       const edge = alphaAt(x, y) > 160 && (alphaAt(x - gap, y) < 100 || alphaAt(x + gap, y) < 100 || alphaAt(x, y - gap) < 100 || alphaAt(x, y + gap) < 100);
@@ -273,12 +274,12 @@
         }
       }
     }
-    const limit = width < 700 ? 2800 : 6800;
+    const limit = width < 700 ? 6000 : 12000;
     const stride = Math.max(1, candidates.length / limit);
     const geometry = [];
     for (let index = 0; index < candidates.length; index += stride) geometry.push(...candidates[Math.floor(index)]);
     const letterCount = geometry.length / 7;
-    const floorCount = width < 700 ? 180 : 420;
+    const floorCount = 0;
     for (let index = 0; index < floorCount; index++) {
       geometry.push((Math.random() - .5) * width, height / 2 - bottom - 30, (Math.random() - .5) * 480,
         6 + Math.random() * 2, Math.random() * Math.PI * 2, .04 + Math.random() * .08, 0);
@@ -291,15 +292,21 @@
     for (let index = 0; index < count; index++) {
       packed.push(...geometry.slice(index * 7, index * 7 + 7));
       if (index < letterCount) {
-        packed.push(...window.MXIShapes.robot(index, robotScale),
-          ...window.MXIShapes.brain(index, letterCount, roundScale),
-          ...window.MXIShapes.earth(index, letterCount, roundScale));
+        if (referenceActive) {
+          packed.push(...window.MXIReference.sample("robot", index, letterCount, width * .74, height * .88),
+            ...window.MXIReference.sample("brain", index, letterCount, width * .78, height * .84),
+            ...window.MXIReference.sample("earth", index, letterCount, width * .74, height * .84));
+        } else {
+          packed.push(...window.MXIShapes.robot(index, robotScale),
+            ...window.MXIShapes.brain(index, letterCount, roundScale),
+            ...window.MXIShapes.earth(index, letterCount, roundScale));
+        }
       } else packed.push(0,0,0,0, 0,0,0,0, 0,0,0,0);
     }
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(packed), gl.STATIC_DRAW);
     const edges = buildEdges(geometry);
     edgeCount = edges.length;
-    const brainEdges = buildBrainEdges(packed);
+    const brainEdges = referenceActive ? new Uint16Array() : buildBrainEdges(packed);
     brainEdgeCount = brainEdges.length;
     const combinedEdges = new Uint16Array(edgeCount + brainEdgeCount);
     combinedEdges.set(edges);

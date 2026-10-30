@@ -8,7 +8,8 @@
 
 - [x] Keep only the logo/GitHub header, particle sculpture, and brand caption.
 - [x] Remove extra sections, labels, explanations, visible instructions, and all animation buttons.
-- [x] Generate recognizable robot, brain, and globe geometry and a continuous 32-second morph cycle.
+- [x] Generate a detailed original sculpture sheet and sample reference-derived robot, brain, and Earth targets with a continuous 32-second morph cycle.
+- [x] Restore the original sans-serif MXI font and enlarge binary glyphs while reducing overlap.
 - [x] Keep the camera fixed and MXI stationary during its hold, retaining volume and depth layers.
 - [x] Preserve keyboard input, reduced motion, fallback, and visibility suspension.
 - [x] Verify target geometry, ordered loop weights, runtime lifecycle, source syntax, and static scope.

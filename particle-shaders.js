@@ -25,6 +25,7 @@ window.MXIParticleShaders = Object.freeze({
     varying mediump float v_isLetter;
     varying mediump float v_depth;
     varying mediump float v_mxiWeight;
+    varying mediump float v_detail;
     void main() {
       float t = max(0.0, u_time - u_echo);
       float phase = a_traits.y;
@@ -47,12 +48,12 @@ window.MXIParticleShaders = Object.freeze({
       vec2 screen = vec2(cy * p.x + sy * p.z, cx * p.y + sx * sy * p.x - sx * cy * p.z);
       vec2 delta = screen - u_pointer;
       float distance = length(delta);
-      float radius = min(u_resolution.x * 0.27, 170.0);
+      float radius = min(u_resolution.x * 0.22, 135.0);
       float influence = (1.0 - smoothstep(0.0, radius, distance)) * u_pointerActive * a_traits.w;
-      float angle = influence * (0.55 + sin(t * 0.8) * 0.18 + u_pointerEnergy * 0.35);
+      float angle = influence * (0.12 + sin(t * 0.8) * 0.025 + u_pointerEnergy * 0.08);
       vec2 rotated = mat2(cos(angle), -sin(angle), sin(angle), cos(angle)) * delta;
       screen = mix(screen, u_pointer + rotated, influence);
-      screen += delta / max(distance, 1.0) * influence * 13.0;
+      screen += delta / max(distance, 1.0) * influence * 4.0;
       float pulseLight = 0.0;
       for (int index = 0; index < 3; index++) {
         vec4 pulse = u_pulses[index];
@@ -63,14 +64,15 @@ window.MXIParticleShaders = Object.freeze({
           float front = age * (220.0 + u_resolution.x * 0.24);
           float ring = (pulseDistance - front) / 38.0;
           float energy = exp(-ring * ring) * exp(-age * 0.9) * pulse.w;
-          screen += outward / max(pulseDistance, 1.0) * energy * 32.0;
+          screen += outward / max(pulseDistance, 1.0) * energy * 12.0;
           pulseLight += energy * 0.45;
         }
       }
       gl_Position = vec4(screen.x / (u_resolution.x * 0.5), screen.y / (u_resolution.y * 0.5), 0.0, 1.0);
       float shimmer = 0.92 + 0.08 * sin(t * 1.8 + phase * 4.0);
-      gl_PointSize = clamp(a_traits.x * u_dpr * mix(1.0, 2.2, u_glowPass), 6.0, 52.0);
-      float echoOpacity = u_echo > 0.0 ? 0.11 * exp(-u_echo * 4.0) : 1.0;
+      float detailSize = a_traits.x + influence * 4.0 * u_pointerEnergy;
+      gl_PointSize = clamp(detailSize * u_dpr * mix(1.0, 1.9, u_glowPass), 1.0, 32.0);
+      float echoOpacity = u_echo > 0.0 ? 0.07 * exp(-u_echo * 4.0) : 1.0;
       float reveal = smoothstep(0.0, 1.4, t + phase * 0.04);
       float objectAlpha = dot(u_shapes, vec4(a_traits.z, a_robot.w, a_brain.w, a_earth.w));
       v_alpha = mix(a_traits.z, objectAlpha, a_traits.w) * shimmer * echoOpacity * reveal;
@@ -81,6 +83,7 @@ window.MXIParticleShaders = Object.freeze({
       v_isLetter = a_traits.w;
       v_depth = p.z;
       v_mxiWeight = u_shapes.x;
+      v_detail = smoothstep(2.8, 5.5, detailSize);
     }
   `,
   fragmentSource: `
@@ -97,6 +100,7 @@ window.MXIParticleShaders = Object.freeze({
     varying mediump float v_isLetter;
     varying mediump float v_depth;
     varying mediump float v_mxiWeight;
+    varying mediump float v_detail;
     float segmentDistance(vec2 point, vec2 start, vec2 end) {
       vec2 direction = end - start;
       float fraction = clamp(dot(point - start, direction) / dot(direction, direction), 0.0, 1.0);
@@ -129,8 +133,10 @@ window.MXIParticleShaders = Object.freeze({
             segmentDistance(point, vec2(-0.26, -0.64), vec2(0.31, -0.64)))
       );
       float glyph = 1.0 - smoothstep(0.055, 0.13, mix(zeroDistance, oneDistance, v_digit));
+      float finePoint = exp(-dot(point, point) * 5.0);
+      float core = mix(finePoint * 1.25, glyph * 1.2, v_detail);
       float halo = exp(-dot(point, point) * 4.0) * 0.065;
-      float alpha = mix(glyph * 1.3, halo, u_glowPass) * v_alpha * edgeAlpha;
+      float alpha = mix(core, halo, u_glowPass) * v_alpha * edgeAlpha;
       if (alpha < 0.008) discard;
       gl_FragColor = vec4(vec3(0.95, 0.98, 1.0) * v_light, alpha);
     }
