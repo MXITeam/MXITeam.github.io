@@ -104,7 +104,7 @@ window.MXIMathField = (() => {
       const font=width<700?6.5:7.5,gap=width<700?31:37;
       ctx.font=`${font}px monospace`;
       streams.forEach((stream,track)=>{
-        const points=stream.map(p=>project(p.slice(0,3))),lengths=[0];
+        const points=stream.map(project),lengths=[0];
         for(let i=1;i<points.length;i++)lengths.push(lengths[i-1]+Math.hypot(points[i][0]-points[i-1][0],points[i][1]-points[i-1][1]));
         const length=lengths[lengths.length-1],phase=(time*(13+track%4*3)+track*7)%gap;
         let j=1,index=0;

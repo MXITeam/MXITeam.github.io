@@ -59,14 +59,14 @@
   function camera(){return [0,0,1];}
   const smoothRange=(a,b,value)=>{const x=Math.max(0,Math.min(1,(value-a)/(b-a)));return x*x*(3-2*x);};
   let view=[0,0],objectSize=1;
+  let cosYaw=1,sinYaw=0,cosPitch=1,sinPitch=0;
   function project(p,cam){
-    const [yaw,pitch]=view;
-    const x=Math.cos(yaw)*p[0]+Math.sin(yaw)*p[2],z=-Math.sin(yaw)*p[0]+Math.cos(yaw)*p[2];
-    const y=Math.cos(pitch)*p[1]-Math.sin(pitch)*z,depth=Math.sin(pitch)*p[1]+Math.cos(pitch)*z;
+    const x=cosYaw*p[0]+sinYaw*p[2],z=-sinYaw*p[0]+cosYaw*p[2];
+    const y=cosPitch*p[1]-sinPitch*z,depth=sinPitch*p[1]+cosPitch*z;
     const perspective=1/Math.max(.42,1-depth*.38);
     return [width/2+(x-cam[0])*objectSize*cam[2]*perspective,height/2-(y-cam[1])*objectSize*cam[2]*perspective];
   }
-  function viewDepth(p){return Math.sin(view[1])*p[1]+Math.cos(view[1])*(-Math.sin(view[0])*p[0]+Math.cos(view[0])*p[2]);}
+  function viewDepth(p){return sinPitch*p[1]+cosPitch*(-sinYaw*p[0]+cosYaw*p[2]);}
   function mathDiagram(index,x,y,w,h,opacity,t){
     ctx.save();ctx.translate(x,y);ctx.strokeStyle="#cbd7e8";ctx.fillStyle="#dbe5f3";ctx.lineWidth=.9;
     ctx.globalAlpha=opacity;ctx.shadowBlur=0;ctx.lineCap="round";ctx.lineJoin="round";
@@ -280,6 +280,7 @@
     const active=(state.from>0&&state.from<6?1-state.mix:0)+(state.to>0&&state.to<6?state.mix:0);
     const volume=sceneLayers?0:(state.from===4||state.from===5?1-state.mix:0)+(state.to===4||state.to===5?state.mix:0);
     view=[(-.34+Math.sin(t*.095)*(.10+volume*.3))*active-.26*endWeight,(.12+Math.sin(t*.07)*(.045+volume*.09))*active+.085*endWeight];
+    cosYaw=Math.cos(view[0]);sinYaw=Math.sin(view[0]);cosPitch=Math.cos(view[1]);sinPitch=Math.sin(view[1]);
     objectSize=size*(1+endWeight*.65+active*.12);
     const current=state.mix>.5?state.to:state.from;
     sceneButtons.forEach(button=>button.setAttribute("aria-current",Number(button.dataset.scene)===current?"step":"false"));
