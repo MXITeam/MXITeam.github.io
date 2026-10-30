@@ -17,7 +17,9 @@ img,canvas { display:block; }
 .brand img { object-fit:contain; }
 .brand>span { font-size:28px; letter-spacing:-.055em; font-weight:750; }
 .brand>.brand-separator { font-size:18px; font-weight:400; letter-spacing:0; color:#c5ccd6; }
-.brand>.brand-research { font-size:13px; font-weight:400; letter-spacing:.035em; color:#b9c2cf; }
+.header-actions { display:flex; align-items:center; gap:clamp(14px,2.5vw,32px); }
+.header-research { font-size:12px; color:#bcc7d8; }
+.header-actions .header-github { padding-left:0; }
 .header-github { font-size:12px; padding:12px 0 12px 20px; color:#bcc7d8; }
 .header-github span { margin-left:17px; color:#edf3ff; }
 .hero { position:relative; height:calc(100svh - 84px); min-height:0; isolation:isolate; }
@@ -43,6 +45,7 @@ img,canvas { display:block; }
  .brand img { width:35px; height:35px; }
  .brand>span { font-size:25px; }
  .header-github { font-size:11px; }
+ .header-research { font-size:11px; }
  .hero { height:calc(100svh - 70px); }
  .hero-tagline { font-size:19px; bottom:105px; }
  .scene-navigation { bottom:22px; }
