@@ -30,6 +30,7 @@ window.MXIMathDetail = (() => {
     uniform float u_time;
     uniform float u_neural;
     uniform float u_robot;
+    uniform float u_universe;
     varying mediump vec2 v_uv;
     void main() {
       float light=texture2D(u_source,v_uv).r;
@@ -65,6 +66,10 @@ window.MXIMathDetail = (() => {
       // sparse neural branches on the right or drawing the source rectangle.
       float cortex=u_neural*(1.-smoothstep(.38,.55,v_uv.x));
       alpha+=cortex*pow(light,1.5)*.25*u_opacity;
+      // The accretion disk contains fine bright rings. Restore those ridges
+      // without filling the dark event horizon or lighting the crop edges.
+      float diskPulse=.55+.30*smoothstep(-.5,.8,sin(u_time*.65+v_uv.x*4.-v_uv.y*3.));
+      alpha+=u_universe*pow(ridge,.65)*diskPulse*u_opacity;
       gl_FragColor=vec4(.94,.97,1.,alpha);
     }
   `;
@@ -121,7 +126,7 @@ window.MXIMathDetail = (() => {
     gl.texImage2D(gl.TEXTURE_2D,0,gl.LUMINANCE,width,height,0,gl.LUMINANCE,gl.UNSIGNED_BYTE,luminance);
     gl.pixelStorei(gl.UNPACK_ALIGNMENT,4);
     const attributes=[gl.getAttribLocation(program,"a_position"),gl.getAttribLocation(program,"a_uv")];
-    const uniforms=Object.fromEntries(["resolution","view","camera","size","source","texel","opacity","time","neural","robot"].map(name=>[name,gl.getUniformLocation(program,"u_"+name)]));
+    const uniforms=Object.fromEntries(["resolution","view","camera","size","source","texel","opacity","time","neural","robot","universe"].map(name=>[name,gl.getUniformLocation(program,"u_"+name)]));
     return Object.freeze({draw({width,height,view,camera,size,opacity,time=0}){
       if(opacity<.002)return;
       gl.useProgram(program);gl.disable(gl.DEPTH_TEST);gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE);
@@ -135,6 +140,7 @@ window.MXIMathDetail = (() => {
       gl.uniform1f(uniforms.time,time);
       gl.uniform1f(uniforms.neural,surface.act===3?1:0);
       gl.uniform1f(uniforms.robot,surface.act===2?1:0);
+      gl.uniform1f(uniforms.universe,surface.act===4?1:0);
       gl.drawArrays(gl.TRIANGLES,0,vertices.length/5);
       gl.disable(gl.BLEND);
     }});
