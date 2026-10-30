@@ -4,7 +4,7 @@ Date: 2026-10-30.
 
 ## Final revision
 
-English-only website; black background; bright silver-white volumetric particle letters spelling MXI, with a separate additive glow pass. Automatic motion includes an initial assembly, continuous rotation and surface motion, and a 14-second scatter/reassembly cycle. Pointer input is optional. The local logo is the owner's supplied GitHub avatar. MXI wordmarks have no trailing dot.
+English-only website; black background; bright silver-white volumetric MXI lettering made from procedurally drawn **0 and 1 glyphs**, with a separate additive glow pass. The brand expands to **Mathematics x Intelligence**. Automatic motion includes an initial assembly, continuous rotation, surface motion, digit changes, and a 14-second scatter/reassembly cycle. Pointer input is optional. The local logo is the owner's supplied GitHub avatar. MXI wordmarks have no trailing dot.
 
 ## Completed checks
 

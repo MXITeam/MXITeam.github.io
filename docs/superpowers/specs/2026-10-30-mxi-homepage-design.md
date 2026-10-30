@@ -4,7 +4,7 @@ Build the MXI AI team's public-facing homepage in this GitHub Pages repository. 
 
 All website copy is English-only. MXI expands to **Mathematics x Intelligence**, as supplied by the owner; use this wording in the page title, hero tagline, introduction, and footer. Sections: introduction, research interests, the public EmbodiedAI-Demo-Pipeline project, engineering principles, and GitHub collaboration links. Project statements come from its public README. Do not publish private repository names, invented people, publications, results, or contact details.
 
-Use buildless HTML, CSS, JavaScript, WebGL, and local assets, with no required third-party scripts or fonts. Generate volumetric letter geometry locally and animate rotation, surface motion, scatter/reassembly, and cursor repulsion. Support keyboard navigation, reduced motion, pause/resume, narrow screens, and a readable semantic heading without JavaScript or graphics. Suspend animation offscreen and in hidden tabs.
+Use buildless HTML, CSS, JavaScript, WebGL, and local assets, with no required third-party scripts or fonts. Generate volumetric letter geometry locally, using readable, luminous **0 and 1 glyphs** as individual particles, as requested by the owner. Adjust glyph size and density for readable binary detail. Animate rotation, surface motion, digit changes, scatter/reassembly, and cursor repulsion. Support keyboard navigation, reduced motion, pause/resume, narrow screens, and a readable semantic heading without JavaScript or graphics. Suspend animation offscreen and in hidden tabs.
 
 Deliver committed source to the specified repository. Enable GitHub Pages only if the existing repository's plan and visibility permit it. Do not change repository visibility without owner approval.
 

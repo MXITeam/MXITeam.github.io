@@ -1,6 +1,6 @@
 "use strict";
 
-// Volumetric point-cloud lettering. All geometry and shaders are generated locally.
+// Volumetric binary lettering. Geometry and 0/1 glyphs are generated locally.
 (() => {
   const stage = document.querySelector("#particle-stage");
   const canvas = document.querySelector("#mxi-particles");
@@ -25,6 +25,7 @@
     uniform mediump float u_glowPass;
     varying mediump float v_alpha;
     varying mediump float v_light;
+    varying mediump float v_digit;
     void main() {
       float t = u_time;
       float phase = a_traits.y;
@@ -33,7 +34,6 @@
       float cycle = mod(t, 14.0);
       float burst = smoothstep(9.0, 10.4, cycle) * (1.0 - smoothstep(11.3, 13.5, cycle));
       float entrance = 1.0 - smoothstep(0.0, 2.4, t);
-      float drift = sin(t * 1.1 + phase + p.x * 0.009);
       p.x += sin(t * 1.5 + phase) * 2.4 * isLetter;
       p.y += cos(t * 1.25 + phase) * 2.0 * isLetter;
       p.z += sin(p.x * 0.018 + p.y * 0.02 + t * 1.7 + phase * 0.2) * 10.0;
@@ -57,23 +57,38 @@
       screen += difference / max(distance, 1.0) * influence * 43.0;
       gl_Position = vec4(screen.x / (u_resolution.x * 0.5), screen.y / (u_resolution.y * 0.5), 0.0, 1.0);
       float sparkle = 0.82 + 0.18 * sin(t * 2.0 + phase * 4.0);
-      float glowScale = mix(1.0, 2.8, u_glowPass);
-      gl_PointSize = clamp(a_traits.x * perspective * u_dpr * sparkle * glowScale, 1.5, 14.0);
+      float glowScale = mix(1.0, 2.2, u_glowPass);
+      gl_PointSize = clamp(a_traits.x * perspective * u_dpr * sparkle * glowScale, 6.0, 52.0);
       v_alpha = a_traits.z * (0.7 + 0.3 * sparkle);
       v_light = 0.94 + 0.06 * sin(p.x * 0.006 - t * 0.7 + phase);
+      v_digit = step(0.5, fract(phase * 0.23 + floor(t * 0.5 + phase) * 0.618));
     }
   `;
   const fragmentSource = `
     precision mediump float;
     varying mediump float v_alpha;
     varying mediump float v_light;
+    varying mediump float v_digit;
     uniform mediump float u_glowPass;
+    float segmentDistance(vec2 point, vec2 start, vec2 end) {
+      vec2 direction = end - start;
+      float fraction = clamp(dot(point - start, direction) / dot(direction, direction), 0.0, 1.0);
+      return length(point - start - direction * fraction);
+    }
     void main() {
-      vec2 offset = gl_PointCoord - vec2(0.5);
-      float radius = length(offset) * 2.0;
-      if (radius > 1.0) discard;
-      float core = exp(-radius * radius * mix(2.0, 4.0, u_glowPass));
-      float alpha = core * v_alpha * mix(1.2, 0.10, u_glowPass);
+      vec2 point = (gl_PointCoord - vec2(0.5)) * vec2(2.0, -2.0);
+      // Signed-distance-style masks keep each binary digit crisp at any scale.
+      float zeroDistance = abs(length(point / vec2(0.38, 0.66)) - 1.0) * 0.38;
+      float oneDistance = min(
+        segmentDistance(point, vec2(0.04, -0.64), vec2(0.04, 0.64)),
+        min(segmentDistance(point, vec2(-0.26, 0.38), vec2(0.04, 0.64)),
+            segmentDistance(point, vec2(-0.26, -0.64), vec2(0.31, -0.64)))
+      );
+      float glyphDistance = mix(zeroDistance, oneDistance, v_digit);
+      float glyph = 1.0 - smoothstep(0.055, 0.13, glyphDistance);
+      float halo = exp(-dot(point, point) * 4.0) * 0.065;
+      float alpha = mix(glyph * 1.25, halo, u_glowPass) * v_alpha;
+      if (alpha < 0.008) discard;
       gl_FragColor = vec4(vec3(0.95, 0.98, 1.0) * v_light, alpha);
     }
   `;
@@ -194,18 +209,18 @@
     maskContext.fillText("MXI", width / 2, baseline);
     const pixels = maskContext.getImageData(0, 0, width, height).data;
     const alphaAt = (x, y) => x < 0 || y < 0 || x >= width || y >= height ? 0 : pixels[(Math.floor(y) * width + Math.floor(x)) * 4 + 3];
-    const gap = width < 700 ? 2 : 3;
+    const gap = width < 700 ? 5 : 8;
     const depth = fontSize * .23;
     const candidates = [];
     const addPoint = (x, y, z, size, opacity, letter = 1) => candidates.push([x, y, z, size, Math.random() * Math.PI * 2, opacity, letter]);
     for (let y = gap; y < height - gap; y += gap) {
       for (let x = gap; x < width - gap; x += gap) {
         if (alphaAt(x, y) < 160) continue;
-        const px = x - width / 2 + (Math.random() - .5) * gap;
-        const py = height / 2 - y + (Math.random() - .5) * gap;
-        const size = .85 + Math.random() * 1.4;
+        const px = x - width / 2 + (Math.random() - .5) * gap * .3;
+        const py = height / 2 - y + (Math.random() - .5) * gap * .3;
+        const size = width < 700 ? 7 + Math.random() * 2 : 10 + Math.random() * 3;
         addPoint(px, py, depth / 2, size, .65 + Math.random() * .35);
-        addPoint(px, py, -depth / 2, size * .8, .28 + Math.random() * .3);
+        addPoint(px, py, -depth / 2, size * .8, .18 + Math.random() * .2);
         const edge = alphaAt(x - gap, y) < 100 || alphaAt(x + gap, y) < 100 || alphaAt(x, y - gap) < 100 || alphaAt(x, y + gap) < 100;
         if (edge) {
           for (let z = -depth / 2; z < depth / 2; z += gap * 1.6) addPoint(px, py, z, size, .5 + Math.random() * .4);
@@ -214,17 +229,17 @@
         }
       }
     }
-    const limit = width < 700 ? 15000 : 34000;
+    const limit = width < 700 ? 3000 : 7000;
     const stride = Math.max(1, candidates.length / limit);
     const geometry = [];
     for (let index = 0; index < candidates.length; index += stride) geometry.push(...candidates[Math.floor(index)]);
-    // A quiet floor of particles gives the letters a physical, volumetric setting.
+    // A quiet floor of binary digits anchors the letters in the same 3D space.
     const floorY = -(metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent) / 2 - height * .06;
-    const floorCount = width < 700 ? 850 : 1800;
+    const floorCount = width < 700 ? 220 : 500;
     for (let index = 0; index < floorCount; index++) {
       const x = (Math.random() - .5) * width * 1.25;
       const z = (Math.random() - .5) * 580;
-      geometry.push(x, floorY, z, .5 + Math.random() * 1.0, Math.random() * Math.PI * 2, .06 + Math.random() * .14, 0);
+      geometry.push(x, floorY, z, 6 + Math.random() * 3, Math.random() * Math.PI * 2, .06 + Math.random() * .14, 0);
     }
     count = geometry.length / 7;
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(geometry), gl.STATIC_DRAW);
