@@ -50,7 +50,7 @@
   const sceneLayers=referenceReady?window.MXIStoryLayers?.create(gl,reference):null;
   const reduced=window.matchMedia("(prefers-reduced-motion: reduce)");
   let width=0,height=0,dpr=1,size=1,count=0,frame=0,resizeFrame=0,lastClock=0,lastPaint=0,time=0;
-  let gridWidth=1,gridHeight=1,fieldWidth=1,fieldHeight=1,baseCell=8.5;
+  let gridWidth=1,gridHeight=1,fieldWidth=1,fieldHeight=1,baseCell=8.5,detailCell=3.2;
   let paused=false,visible=true,lost=false;
   let reducedScene=6;
   const pointer={x:0,y:0,active:0,target:0},pulses=[];
@@ -67,6 +67,50 @@
     return [width/2+(x-cam[0])*objectSize*cam[2]*perspective,height/2-(y-cam[1])*objectSize*cam[2]*perspective];
   }
   function viewDepth(p){return Math.sin(view[1])*p[1]+Math.cos(view[1])*(-Math.sin(view[0])*p[0]+Math.cos(view[0])*p[2]);}
+  function mathDiagram(index,x,y,w,h,opacity,t){
+    ctx.save();ctx.translate(x,y);ctx.strokeStyle="#cbd7e8";ctx.fillStyle="#dbe5f3";ctx.lineWidth=.9;
+    ctx.globalAlpha=opacity;ctx.shadowBlur=0;ctx.lineCap="round";ctx.lineJoin="round";
+    const point=([u,v])=>[u*w/2,v*h/2];
+    const path=(points,close=false)=>{
+      ctx.beginPath();points.forEach((p,i)=>{const [px,py]=point(p);if(i)ctx.lineTo(px,py);else ctx.moveTo(px,py);});
+      if(close)ctx.closePath();ctx.stroke();
+    };
+    const axes=()=>{path([[-1,.85],[1,.85]]);path([[-.95,.95],[-.95,-1]]);};
+    const phase=reduced.matches?0:t*.35;
+    if(index===0){
+      // Heat kernels broaden while their peak decays.
+      axes();
+      for(let j=0;j<5;j++){
+        const variance=.2+j*.2;ctx.globalAlpha=opacity*(1-j*.12);
+        path(Array.from({length:49},(_,k)=>{const u=k/24-1;return [u,.8-.56/Math.sqrt(variance)*Math.exp(-u*u/variance)];}));
+      }
+    }else if(index===1){
+      // A vibrating membrane shown as a shallow perspective wire surface.
+      const surface=(u,v)=>[u*.73+v*.24,v*.36-.52*Math.sin(u*3-phase)*Math.cos(v*3)];
+      for(let j=0;j<9;j++){
+        const v=j/4-1;ctx.globalAlpha=opacity*(.45+j*.055);
+        path(Array.from({length:33},(_,k)=>surface(k/16-1,v)));
+        path(Array.from({length:33},(_,k)=>surface(v,k/16-1)));
+      }
+    }else if(index===2){
+      axes();
+      for(const sign of [-1,1]){ctx.globalAlpha=opacity*.35;path(Array.from({length:65},(_,k)=>{const u=k/32-1;return [u,sign*.74*Math.exp(-u*u*3)];}));}
+      ctx.globalAlpha=opacity;path(Array.from({length:97},(_,k)=>{const u=k/48-1;return [u,.74*Math.exp(-u*u*3)*Math.cos(u*13-phase)];}));
+    }else if(index===3){
+      // Streamlines bend around a cylindrical obstacle.
+      for(let j=-4;j<=4;j++)if(j){const v=j*.19;path(Array.from({length:49},(_,k)=>{const u=k/24-1;return [u,v+Math.sign(v)*.3*Math.exp(-u*u/.14)*(1-Math.abs(v))];}));}
+      ctx.beginPath();ctx.ellipse(0,0,w*.105,h*.25,0,0,Math.PI*2);ctx.stroke();
+    }else if(index===4){
+      // Potential level sets over a curved radial field.
+      for(let j=1;j<=6;j++){const r=j/6;path(Array.from({length:49},(_,k)=>{const a=k/48*Math.PI*2;return [r*Math.cos(a),r*.5*Math.sin(a)+.65*(1-r)*(1-r)];}),true);}
+      for(let j=0;j<8;j++){const a=j/8*Math.PI*2;path(Array.from({length:25},(_,k)=>{const r=k/24;return [r*Math.cos(a),r*.5*Math.sin(a)+.65*(1-r)*(1-r)];}));}
+    }else{
+      axes();
+      // Successive reaction-diffusion fronts, travelling toward positive x.
+      for(let j=0;j<4;j++){const shift=-.55+j*.34;ctx.globalAlpha=opacity*(.45+j*.16);path(Array.from({length:49},(_,k)=>{const u=k/24-1;return [u,.8-1.5/(1+Math.exp(7*(u-shift)))];}));}
+    }
+    ctx.restore();
+  }
   function foregroundScene(state,t,cam){
     if(!ctx)return;
     ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,width,height);
@@ -162,41 +206,52 @@
     }
     const mathWeight=(state.from===1?heldFlow:0);
     sceneLayers?.drawFlow({state,context:ctx,project:p=>project(p,cam),width,height,time:t});
+    window.MXIStoryAccessories?.draw({context:ctx,act:state.from,opacity:heldFlow*smoothRange(.8,2.6,state.local),project:p=>project(p,cam),width,height,time:t,reduced:reduced.matches});
     if(mathWeight>.01){
       // Typeset at display resolution: the formula stays readable independently
       // of particle density. Superscripts are actual raised runs, not substitutes.
-      const compact=width<700;
+      const compact=width<700||height<260;
       const face='"Bradley Hand", "Segoe Print", "Comic Sans MS", cursive';
       const equations=[
-        [{text:"e"},{text:"iπ",sup:true},{text:" + 1 = 0"}],
-        [{text:"a² + b² = c²"}],
-        [{text:"∫"},{text:"∞",sup:true},{text:"−∞",sub:true},{text:" e"},{text:"−x²",sup:true},{text:" dx = √π"}],
-        [{text:"V − E + F = 2"}],
-        [{text:"∇ · (∇ × F) = 0"}],
-        [{text:"∫"},{text:"b",sup:true},{text:"a",sub:true},{text:" f(x) dx = F(b) − F(a)"}]
+        [{text:"∂"},{text:"t",sub:true},{text:"u = κ ∇"},{text:"2",sup:true},{text:"u"}],
+        [{text:"∂"},{text:"2",sup:true},{text:"t",sub:true},{text:"u = c"},{text:"2",sup:true},{text:"∇"},{text:"2",sup:true},{text:"u"}],
+        [{text:"iℏ ∂"},{text:"t",sub:true},{text:"ψ = −(ℏ"},{text:"2",sup:true},{text:"/2m)∇"},{text:"2",sup:true},{text:"ψ + Vψ"}],
+        [{text:"∂"},{text:"t",sub:true},{text:"v + (v·∇)v = −ρ"},{text:"−1",sup:true},{text:"∇p + ν∇"},{text:"2",sup:true},{text:"v"}],
+        [{text:"∇"},{text:"2",sup:true},{text:"φ = 4πGρ"}],
+        [{text:"∂"},{text:"t",sub:true},{text:"u = D∇"},{text:"2",sup:true},{text:"u + ru(1 − u)"}]
       ];
-      const spread=Math.min(width*.32,size*1.12);
+      const spread=Math.min(width*.32,Math.max(size*1.12,width*.24));
       const positions=compact?
-        [[width*.23,height*.09,17,-.07],[width*.77,height*.16,14,.055],[width*.25,height*.86,15,-.035],[width*.75,height*.92,16,.035]]:
+        [[width*.45,Math.max(22,height*.14),17,-.045],[width*.52,height*.80,16,.035]]:
         [[width/2-spread*.86,height*.19,26,-.065],[width/2+spread*.94,height*.35,22,.05],
           [width/2-spread*1.1,height*.55,23,-.025],[width/2+spread*.82,height*.78,25,-.055],
           [width/2-spread*.63,height*.83,19,.035],[width/2+spread*.51,height*.095,21,.025]];
       ctx.textAlign="left";ctx.textBaseline="alphabetic";ctx.shadowBlur=0;
       positions.forEach(([x,y,font,angle],i)=>{
-        let cursor=0,lastSuper=0;
+        let cursor=0,scriptStart=null,lastScript=null;
         const runs=equations[i].map(run=>{
           const px=font*(run.sup||run.sub ? .62 : 1);
           ctx.font=`${px}px ${face}`;
           const advance=ctx.measureText(run.text).width;
-          const offset=run.sub?cursor-lastSuper:cursor;
-          if(!run.sub){cursor+=advance;lastSuper=run.sup?advance:0;}
+          const kind=run.sup?"sup":run.sub?"sub":null;
+          if(!kind){scriptStart=null;lastScript=null;}
+          else if(scriptStart===null||lastScript===kind)scriptStart=cursor;
+          const offset=kind?scriptStart:cursor;
+          cursor=Math.max(cursor,offset+advance);lastScript=kind;
           return {...run,px,offset};
         });
         ctx.globalAlpha=mathWeight*(.63+(i%3)*.055+.025*Math.sin(t*.45+i));
         const bob=reduced.matches?0:Math.sin(t*.35+i)*.65;
         ctx.save();ctx.translate(x,y+bob);ctx.rotate(angle);
+        const textScale=Math.min(1,(compact?width*.86:Math.max(220,width*.30))/cursor);
+        ctx.scale(textScale,textScale);
         for(const run of runs){ctx.font=`${run.px}px ${face}`;ctx.fillText(run.text,-cursor/2+run.offset,run.sup?-font*.48:run.sub?font*.3:0);}
+        if(i===3){ctx.font=`${font*.58}px ${face}`;ctx.fillText("∇ · v = 0",-cursor/2,font*.85);}
         ctx.restore();
+        const graphWidth=compact?60:Math.max(70,Math.min(110,height*.22)),graphHeight=compact?30:Math.max(36,Math.min(56,height*.11));
+        const below=y+14+(i===3?font:0)+graphHeight/2;
+        const graphY=below+graphHeight/2+8<height?below:y-font-graphHeight/2-10;
+        if(height>=180||i===0)mathDiagram(i,x+(i%2?1:-1)*graphWidth*.08,graphY,graphWidth,graphHeight,mathWeight*(.32+.1*Math.sin(t*.6+i)**2),t);
       });
       ctx.textAlign="center";ctx.textBaseline="middle";
     }
@@ -229,7 +284,7 @@
     // The compass and topology need several times the samples of a solid wordmark.
     // Allocate once at the finest resolution, then smoothly change the active
     // viewport. Transitions keep their particle identities and do not reallocate.
-    const bodyCell=baseCell*(1-active)+Math.min(3.2,baseCell)*active;
+    const bodyCell=baseCell*(1-active)+detailCell*active;
     const ribbonWeight=Math.sin(Math.PI*state.progress)**4;
     const cell=bodyCell+(Math.max(bodyCell,Math.min(7.5,baseCell))-bodyCell)*ribbonWeight;
     gridWidth=Math.max(1,Math.round(width/cell));gridHeight=Math.max(1,Math.round(height/cell));
@@ -281,7 +336,11 @@
     // Glyph cells follow the subject, so a small screen keeps the same number of
     // 0/1 across the body; 8 device pixels is the smallest legible glyph.
     baseCell=Math.max(8/dpr,Math.min(8.5,size/38));
-    const fieldCell=Math.min(3.2,baseCell);
+    // Preserve detail across a shorter stage: a fixed 3.2px grid used to lose
+    // about a third of the subject's samples when Projects entered the viewport.
+    // Larger flow glyphs remain independently sized for readable moving 0/1.
+    detailCell=Math.min(3.2,Math.max(2.2,size/84));
+    const fieldCell=Math.min(detailCell,baseCell);
     fieldWidth=Math.max(1,Math.round(width/fieldCell));fieldHeight=Math.max(1,Math.round(height/fieldCell));
     gl.bindTexture(gl.TEXTURE_2D,fieldTexture);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,fieldWidth,fieldHeight,0,gl.RGBA,gl.UNSIGNED_BYTE,null);
     gl.bindRenderbuffer(gl.RENDERBUFFER,fieldDepth);gl.renderbufferStorage(gl.RENDERBUFFER,gl.DEPTH_COMPONENT16,fieldWidth,fieldHeight);

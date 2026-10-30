@@ -46,7 +46,7 @@
 - 全站只写英文。与我沟通、交付说明可以使用中文。
 - 背景纯黑，主体由银白色 **0 和 1** 构成。避免彩虹色、大面积彩色背景、发光雾团和过度 bloom。
 - 数学公式等少量文字可以使用手写体，不必全做成粒子。
-- 最新要求：主视觉下方增加 Projects 区域，三个项目上下纵向排列，桌面每行左侧标题、右侧说明，手机说明位于标题下方。项目依次为 `MXI v0 [Preview]` / `Perception, Memory, Prediction, Action`，`MXI RoboICL` / `In-Context Learning on Robotics`，`MXI SimWorld` / `Simulating World as Policy`。项目不使用数字编号，分别用神经网络、机器人、立方体的银白线条图标。保持黑底银白字，不添加未经提供的项目链接、成果或介绍。
+- 最新要求：主视觉下方增加 Projects 区域，三个项目上下纵向排列，桌面每行左侧标题、右侧说明，手机说明位于标题下方。项目依次为 `MXI v0 [Preview]` / `Perception, Memory, Prediction, Action`，`MXI RoboICL` / `In-Context Learning on Robotics`，`MXI SimWorld` / `Simulating World as Policy`。项目不使用数字编号，分别用脑组织、机械臂、立体场景的细致银白技术线稿。保持黑底银白字，不添加未经提供的项目链接、成果或介绍。
 - 不恢复已删除的标语：`MATHEMATICS IN MOTION`、`PERCEIVE / REASON / PREDICT / ACT`、`Exploring intelligence...`、`Move to bend the field...`。
 - 不增加 Flow、Network、Wave、Animation、Pause 等可见控制按钮。**用户后来要求的编号导航要保留，前五项显示 01–05 和 I–V，最后显示 1011 MXI。**
 - 旧的“左侧固定 MXI、右侧循环图形”构图已被后续要求替代。现在是一个完整的、居中的、左右无边框的全幅序列。
@@ -107,7 +107,7 @@
 - 使用原来的粗无衬线字形：`Arial Black / Arial / sans-serif`。用户试过罗马体，之后明确要求换回。
 - 字母不晃动、不摇摆、不自动旋转；可以保留固定斜视角和内部粒子活动。
 - 数字应该看得出是 0/1；避免密集重叠、摩尔纹和噪声。
-- 在合适位置保留 `Mathematics x Intelligence`。
+- MXI 末幕不显示 `Mathematics x Intelligence` 标语，仅保留粒子字母。
 
 ## 5. 转场的关键要求
 
@@ -212,3 +212,5 @@
 - 如果使用新的三维资产，说明来源和许可。
 
 先交付一个肉眼可见改善的实现，再写结论。请不要宣称“高级、清晰、3D”而不给实际可复核的视觉结果。
+
+最新补充：数学标注改为热传导、波动、薛定谔、Navier–Stokes、泊松和反应扩散方程，并配对应的淡色扩散曲线、波面、流线和等势图。手机保留两组可读公式，极矮画面限制图形数量。机器人增加关节电机和摄像头；大脑增加胶囊、培养皿、烧瓶；宇宙增加卫星。配件使用透视、接缝、螺栓等技术线稿细节，随数字流淡入淡出。短动画区的主体采样间距随主体尺寸缩小，避免固定网格造成清晰度下降。
