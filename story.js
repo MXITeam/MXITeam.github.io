@@ -323,7 +323,10 @@
   }
   function animate(clock){
     frame=0;
-    if(clock-lastPaint>=1000/(width<500?30:45)){
+    // Animation timestamps can be rounded just below the frame interval.
+    // A 1 ms tolerance prevents regularly skipping the next refresh (e.g.
+    // rendering at 20 instead of 30 fps on a 60 Hz display).
+    if(clock-lastPaint+1>=1000/(width<500?30:45)){
       const delta=lastClock?Math.min((clock-lastClock)/1000,.08):0;
       time+=delta;lastClock=clock;lastPaint=clock;
       pointer.active+=(pointer.target-pointer.active)*(1-Math.exp(-delta*5));render();
