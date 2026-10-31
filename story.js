@@ -348,11 +348,11 @@
   }
   function renderDpr(viewWidth,viewHeight){
     const deviceDpr=window.devicePixelRatio||1;
-    if(viewWidth<700)return Math.max(2,Math.min(deviceDpr,3));
-    // On low-density desktops, fine binary strokes alias into horizontal
-    // bands. Supersample up to 2x, with a pixel budget for larger stages.
-    const nativeDpr=Math.min(deviceDpr,2);
+    // Preserve high-density phone detail in either orientation. Limit the
+    // expensive 3x backing store by area, rather than by a width breakpoint.
     const budgetDpr=Math.sqrt(3000000/Math.max(1,viewWidth*viewHeight));
+    const nativeDpr=Math.min(deviceDpr,3,Math.max(2,budgetDpr));
+    // Supersample low-density displays where the budget allows.
     return Math.max(nativeDpr,Math.min(2,budgetDpr));
   }
   function resize(){
