@@ -300,7 +300,10 @@
     // viewport. Transitions keep their particle identities and do not reallocate.
     const bodyCell=baseCell*(1-active)+detailCell*active;
     const ribbonWeight=Math.sin(Math.PI*state.progress)**4;
-    const cell=bodyCell+(Math.max(bodyCell,Math.min(7.5,baseCell))-bodyCell)*ribbonWeight;
+    // Keep the glyph grid at the body resolution as the current passes. Scaling
+    // the grid during the transition shifts every cell at once and makes the
+    // characters appear to jump even though the underlying particles move smoothly.
+    const cell=bodyCell;
     gridWidth=Math.max(1,Math.round(width/cell));gridHeight=Math.max(1,Math.round(height/cell));
     gl.bindFramebuffer(gl.FRAMEBUFFER,fieldBuffer);gl.viewport(0,0,gridWidth,gridHeight);
     gl.disable(gl.BLEND);gl.enable(gl.DEPTH_TEST);gl.depthFunc(gl.LESS);gl.depthMask(true);
