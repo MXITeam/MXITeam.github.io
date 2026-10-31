@@ -94,6 +94,13 @@ window.MXIStoryReference = (() => {
       const cortex=.06+.46*Math.sqrt(Math.max(0,1-((x+.1)/.85)**2-((y-.03)/.7)**2));
       depth=cortex*(1-neural)+(.08+x*.13+y*.07)*neural;
     }
+    else if(act===5){
+      // Give the closing MXI glyphs a shallow extruded face with beveled sides.
+      // The center sits forward; outer strokes turn away into visible depth.
+      const radius=Math.min(1,Math.hypot(x/1.05,y/.58));
+      const bevel=Math.pow(Math.max(0,(radius-.58)/.42),1.4);
+      depth=.22+.24*Math.sqrt(Math.max(0,1-radius*radius))-.16*bevel+x*.10+y*.035;
+    }
     else depth=x*.38+y*.2;
     depth+=(light-.4)*.08;if(back)depth=-Math.abs(depth)-.09;
     const vx=x*(1-depth*.38),vy=y*(1-depth*.38),yaw=-.34,pitch=.12;

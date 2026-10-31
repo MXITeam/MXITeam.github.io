@@ -318,7 +318,7 @@
     const mathWeight=(state.from===1?1-state.mix:0)+(state.to===1?state.mix:0);
     const active=(state.from>0&&state.from<6?1-state.mix:0)+(state.to>0&&state.to<6?state.mix:0);
     const volume=sceneLayers?0:(state.from===4||state.from===5?1-state.mix:0)+(state.to===4||state.to===5?state.mix:0);
-    view=[(-.34+Math.sin(t*.095)*(.10+volume*.3))*active-.26*endWeight,(.12+Math.sin(t*.07)*(.045+volume*.09))*active+.085*endWeight];
+    view=[(-.34+Math.sin(t*.095)*(.10+volume*.3))*active-.39*endWeight,(.12+Math.sin(t*.07)*(.045+volume*.09))*active+.16*endWeight];
     cosYaw=Math.cos(view[0]);sinYaw=Math.sin(view[0]);cosPitch=Math.cos(view[1]);sinPitch=Math.sin(view[1]);
     // The black hole occupies only the middle of its reference panel. Give it
     // a little more room on narrow screens, blending the scale during a morph.
