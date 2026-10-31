@@ -362,7 +362,13 @@
     const nextDpr=renderDpr(w,h);
     if(!w||!h||(w===width&&h===height&&nextDpr===dpr))return;
     // Phones have dense displays but a small subject: allow 3x backing pixels there.
-    width=w;height=h;dpr=nextDpr;size=width<700?Math.min(width*.47,height*.32):Math.min(width*.36,height*.45);
+    width=w;height=h;dpr=nextDpr;
+    // Blend the two framing rules across tablet widths instead of jumping at
+    // 700px, which made a one-pixel resize abruptly change the subject scale.
+    const phoneSize=Math.min(width*.47,height*.32);
+    const desktopSize=Math.min(width*.36,height*.45);
+    const tabletBlend=smoothRange(640,760,width);
+    size=phoneSize+(desktopSize-phoneSize)*tabletBlend;
     canvas.width=foreground.width=Math.round(width*dpr);canvas.height=foreground.height=Math.round(height*dpr);
     // Glyph cells follow the subject, so a small screen keeps the same number of
     // 0/1 across the body; 8 device pixels is the smallest legible glyph.
