@@ -214,12 +214,37 @@
     sceneLayers?.drawFlow({state,context:ctx,project:p=>project(p,cam),width,height,time:t});
     window.MXIStoryAccessories?.draw({context:ctx,act:state.from,opacity:heldFlow*smoothRange(.8,2.6,state.local),project:p=>project(p,cam),width,height,time:t,reduced:reduced.matches});
     if(mathWeight>.01){
+      // A shallow gravity well supplies real depth to the mathematics scene.
+      // The mesh is illustrative: its curves are not a numerical GR solution.
+      const well=(u,v)=>{
+        const r2=u*u+v*v;
+        return [u*1.05, -.38-.38*Math.exp(-r2*3)+v*.27, v*.75];
+      };
+      ctx.save();ctx.strokeStyle="#cbdcf4";ctx.fillStyle="#e5efff";
+      ctx.lineWidth=.7;ctx.textAlign="center";ctx.textBaseline="middle";
+      for(let axis=0;axis<2;axis++)for(let row=-5;row<=5;row++){
+        const curve=q=>axis?well(row/5,q):well(q,row/5);
+        ctx.beginPath();
+        for(let k=0;k<=48;k++){
+          const p=project(curve(k/24-1),cam);
+          if(k)ctx.lineTo(...p);else ctx.moveTo(...p);
+        }
+        ctx.globalAlpha=mathWeight*(row===0?.20:.10);ctx.stroke();
+        ctx.font=`${width<700?7:8}px monospace`;
+        for(let n=0;n<3;n++){
+          const q=((n/3+row*.071+(reduced.matches?0:t*.035)+2)%1)*2-1;
+          const p=project(curve(q),cam);
+          ctx.globalAlpha=mathWeight*.42*Math.sin((q+1)*Math.PI/2);
+          ctx.fillText((n+row+axis)%2?'1':'0',...p);
+        }
+      }
+      ctx.restore();
       // Typeset at display resolution: the formula stays readable independently
       // of particle density. Superscripts are actual raised runs, not substitutes.
       const compact=width<700||height<260;
       const face='"Bradley Hand", "Segoe Print", "Comic Sans MS", cursive';
       const equations=[
-        [{text:"∂"},{text:"t",sub:true},{text:"u = κ ∇"},{text:"2",sup:true},{text:"u"}],
+        [{text:"G"},{text:"μν",sub:true},{text:" + Λg"},{text:"μν",sub:true},{text:" = (8πG/c"},{text:"4",sup:true},{text:")T"},{text:"μν",sub:true}],
         [{text:"∂"},{text:"2",sup:true},{text:"t",sub:true},{text:"u = c"},{text:"2",sup:true},{text:"∇"},{text:"2",sup:true},{text:"u"}],
         [{text:"iℏ ∂"},{text:"t",sub:true},{text:"ψ = −(ℏ"},{text:"2",sup:true},{text:"/2m)∇"},{text:"2",sup:true},{text:"ψ + Vψ"}],
         [{text:"∂"},{text:"t",sub:true},{text:"v + (v·∇)v = −ρ"},{text:"−1",sup:true},{text:"∇p + ν∇"},{text:"2",sup:true},{text:"v"}],
