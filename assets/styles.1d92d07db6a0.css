@@ -65,6 +65,8 @@ img,canvas { display:block; }
  .scene-navigation { --node-size:clamp(30px,calc((100vw - 94px)/6),42px); bottom:22px; gap:clamp(3px,1.2vw,8px); max-width:calc(100vw - 24px); }
  .scene-navigation button { font-size:10px; }
  .scene-navigation button[aria-current="step"] { font-size:12px; }
+ .scene-navigation button[data-scene="6"] { font-size:clamp(8px,2.6vw,10px); }
+ .scene-navigation button[data-scene="6"][aria-current="step"] { font-size:clamp(9px,2.8vw,11px); }
  .research { padding-block:24px 64px; }
  .research h2 { margin-bottom:20px; }
  .research-project { grid-template-columns:28px minmax(0,1fr); gap:8px 12px; padding-block:22px; }
