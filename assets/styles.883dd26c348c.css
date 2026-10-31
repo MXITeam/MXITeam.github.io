@@ -93,3 +93,7 @@ img,canvas { display:block; }
  .research h2 { margin-bottom:20px; }
  .research-project { padding-block:24px; }
 }
+@media(max-width:760px) and (max-height:500px) and (orientation:portrait) {
+ /* Short portrait screens still need enough pixels for the particle subject. */
+ .hero { height:clamp(270px,62.5svh,300px); }
+}
