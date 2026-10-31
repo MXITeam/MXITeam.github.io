@@ -228,7 +228,7 @@
       ];
       const spread=Math.min(width*.32,Math.max(size*1.12,width*.24));
       const positions=compact?
-        [[width*.45,Math.max(22,height*.14),17,-.045],[width*.52,height*.80,16,.035]]:
+        [[width*.45,Math.max(20,height*.10),17,-.045],[width*.52,height*.91,16,.035]]:
         [[width/2-spread*.86,height*.19,26,-.065],[width/2+spread*.94,height*.35,22,.05],
           [width/2-spread*1.1,height*.55,23,-.025],[width/2+spread*.82,height*.78,25,-.055],
           [width/2-spread*.63,height*.83,19,.035],[width/2+spread*.51,height*.095,21,.025]];
@@ -365,7 +365,7 @@
     width=w;height=h;dpr=nextDpr;
     // Blend the two framing rules across tablet widths instead of jumping at
     // 700px, which made a one-pixel resize abruptly change the subject scale.
-    const phoneSize=Math.min(width*.47,height*.32);
+    const phoneSize=Math.min(width*.47,height*.38);
     const desktopSize=Math.min(width*.36,height*.45);
     const tabletBlend=smoothRange(640,760,width);
     size=phoneSize+(desktopSize-phoneSize)*tabletBlend;
