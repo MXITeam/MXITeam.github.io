@@ -238,6 +238,16 @@
           ctx.fillText((n+row+axis)%2?'1':'0',...p);
         }
       }
+      // The center is a compact mass / event horizon, not a decorative ring.
+      // Nested projected ellipses read as a lensed photon ring above the well.
+      const lens=project([0,-.43,0],cam),lensRadius=Math.max(5,Math.min(width,height)*.022);
+      ctx.globalAlpha=mathWeight*.78;ctx.fillStyle="#101722";
+      ctx.beginPath();ctx.ellipse(lens[0],lens[1],lensRadius*.78,lensRadius*.58,-.12,0,Math.PI*2);ctx.fill();
+      ctx.strokeStyle="#e5efff";ctx.lineWidth=.8;
+      for(let ring=0;ring<3;ring++){
+        ctx.globalAlpha=mathWeight*(.5-ring*.12);ctx.beginPath();
+        ctx.ellipse(lens[0],lens[1],lensRadius*(1+ring*.32),lensRadius*(.24+ring*.06),-.12,0,Math.PI*2);ctx.stroke();
+      }
       ctx.restore();
       // Typeset at display resolution: the formula stays readable independently
       // of particle density. Superscripts are actual raised runs, not substitutes.
