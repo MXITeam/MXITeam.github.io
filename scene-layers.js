@@ -18,12 +18,15 @@ window.MXIStoryLayers = Object.freeze({
         // Incoming contours wait until the binary morph has finished. On direct
         // navigation the same quiet opening lets particles establish the subject.
         const elapsed=options.state.local;
-        const entrance=Math.max(0,Math.min(1,(elapsed-.8)/1.8));
+        // On small screens the same fine contours cover fewer pixels. Let
+        // them emerge a little sooner and brighter, after the particles lead.
+        const compact=options.width<700;
+        const entrance=Math.max(0,Math.min(1,(elapsed-(compact?.45:.8))/(compact?1.2:1.8)));
         const reveal=entrance*entrance*(3-2*entrance);
         if(scene!==scenes[options.state.from-1])return;
         const withdraw=Math.max(0,1-options.state.progress/.22);
         const draw={...options,opacity:weight**3*reveal*withdraw*withdraw};
-        scene.detail?.draw({...options,opacity:reveal,progress:options.state.progress});
+        scene.detail?.draw({...options,opacity:reveal*(compact?1.25:1),progress:options.state.progress});
         scene.field?.draw({...draw,opacity:draw.opacity*.65});
       });},
       drawFlow(options){each(options.state,(scene,weight)=>{
