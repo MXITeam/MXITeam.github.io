@@ -55,7 +55,7 @@ body{font-family:var(--article-sans);font-optical-sizing:auto}
 .task-takeaway{border-top:1px solid var(--line);padding-top:18px}
 .task-takeaway strong{font-size:18px!important;font-weight:650;color:var(--accent)}
 .task-takeaway p{font-size:13px;line-height:1.5;margin:8px 0 0}
-.table-scroll th:nth-child(2),.table-scroll td:nth-child(2){color:var(--accent);font-weight:650;background:var(--solid)}
+.table-scroll .benchmark-table th:nth-child(2),.table-scroll .benchmark-table td:nth-child(2),.table-scroll .mxi-score{color:var(--accent);font-weight:650;background:var(--solid)}
 .footprint-highlight{grid-template-columns:1fr 1fr 1.25fr;gap:30px;align-items:center;padding:30px 0 34px;border-bottom:1px solid var(--line);margin-bottom:28px}
 .footprint-highlight strong{font-family:var(--article-serif);font-size:58px;font-weight:450;letter-spacing:-.04em;line-height:1;color:var(--accent)}
 .footprint-highlight>div>span{font-size:14px;line-height:1.5;margin-top:12px}

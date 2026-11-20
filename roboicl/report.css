@@ -22,30 +22,28 @@
 
 .observation-study .wrist-source{margin:0 0 1rem;color:var(--muted);font:500 14px/1.5 var(--article-sans)}
 
-/* Keep benchmark scope readable while giving the actual scores visual priority. */
-.benchmark-table{table-layout:fixed;font-size:21px}
+/* The two comparison columns share one numerical and typographic scale. */
+.benchmark-table{table-layout:fixed;font-size:20px}
 .benchmark-table th,.benchmark-table td{padding:28px 22px;vertical-align:middle}
-.benchmark-table thead th{font-size:18px;font-weight:500;padding-block:18px}
-.benchmark-table th:first-child{width:34%}
-.benchmark-table th:nth-child(2){width:20%}
-.benchmark-table th:nth-child(3){width:28%}
-.benchmark-table th:last-child{width:18%}
+.benchmark-table thead th{font-size:18px;font-weight:600;padding-block:18px}
+.benchmark-table th:first-child{width:28%}
+.benchmark-table th:nth-child(2){width:22%}
+.benchmark-table th:nth-child(3),.benchmark-table th:last-child{width:25%}
 .benchmark-table tbody th{font-size:21px;line-height:1.35}
-.benchmark-table .evaluation-scope,.benchmark-table .comparison-name{display:block;font-size:16px;line-height:1.4;font-weight:400;color:var(--muted)}
-.benchmark-table .evaluation-scope{margin-top:7px}
-.benchmark-table .comparison-name{margin-bottom:6px}
-.benchmark-table .comparison-score{display:block;font-size:32px;font-weight:500;color:var(--text)}
-.table-scroll .benchmark-table td:nth-child(2){font-size:46px;line-height:1.15;letter-spacing:-.035em;font-weight:650}
+.benchmark-table .evaluation-scope{display:block;font-size:16px;line-height:1.4;font-weight:400;color:var(--muted);margin-top:7px}
+.benchmark-table .comparison-score{display:block;font-size:42px;line-height:1.15;letter-spacing:-.025em;font-weight:500;color:var(--text)}
+.benchmark-table td:nth-child(2) .comparison-score{font-weight:650;color:var(--accent)}
 .table-scroll .benchmark-table :is(th,td):nth-child(2){background:color-mix(in srgb,var(--accent) 9%,var(--paper))}
-.benchmark-table td:last-child{font-size:30px;line-height:1.15;letter-spacing:-.025em;color:var(--text)}
-.benchmark-table sup{font-size:12px;margin-left:3px;vertical-align:super}
+.benchmark-table .comparison-delta{display:block;font-size:16px;line-height:1.4;font-weight:500;letter-spacing:0;margin-top:9px;color:var(--accent)}
+.benchmark-table .comparison-delta.negative{color:var(--text)}
+.benchmark-table .comparison-unreported{font-size:28px;color:var(--muted)}
+.table-scroll:focus-visible{outline:2px solid var(--accent);outline-offset:5px}
 @media(max-width:760px){
- .benchmark-table{min-width:650px}
+ .benchmark-table{min-width:720px}
  .benchmark-table th,.benchmark-table td{padding:20px 14px}
- .benchmark-table tbody th{font-size:18px}
- .table-scroll .benchmark-table td:nth-child(2){font-size:36px}
- .benchmark-table .comparison-score{font-size:27px}
- .benchmark-table td:last-child{font-size:25px}
+ .benchmark-table tbody th,.benchmark-table thead th{font-size:17px}
+ .benchmark-table .comparison-score{font-size:34px}
+ .benchmark-table .comparison-delta,.benchmark-table .evaluation-scope{font-size:14px}
 }
 
 .table-scroll table:not(.benchmark-table){font-size:19px;min-width:650px}
@@ -121,3 +119,30 @@ html[data-theme="light"] .shared-score-chart{--score-old:#7a8c99;--score-mxi:#27
 @media(max-width:1000px){.shared-score-layout{grid-template-columns:1fr 1.4fr;gap:30px}.shared-score-heading{display:block}.score-legend{margin-top:20px}.shared-score-mean{padding-right:25px}.shared-score-values{gap:12px}.shared-score-values strong{font-size:34px}}
 @media(max-width:700px){.wrist-study-heading{display:block}.wrist-study-heading>span{display:block;margin-top:7px}.wrist-cue-controls{gap:5px}.wrist-cue-controls>span{width:100%;margin-bottom:4px}.wrist-cue-controls button{font-size:12px;padding:8px 9px;gap:5px}.wrist-feature-label{font-size:10px;left:6px;bottom:7px;padding:4px 6px}.wrist-phase-controls{flex-wrap:wrap}.wrist-phase-controls button[data-frame]{padding:8px 12px}.shared-score-layout{grid-template-columns:1fr;gap:28px}.shared-score-mean{border-right:0;border-bottom:1px solid var(--line);padding:5px 0 24px}.shared-score-values{gap:25px;margin:16px 0 8px}.shared-score-values strong{font-size:43px}.shared-score-gain{margin-top:12px}.shared-score-gain b{font-size:49px}.prose .shared-score-mean p{max-width:none;font-size:14px;margin-top:12px}.score-category-label>span{font-size:14px}.score-legend{gap:15px;font-size:12px}.score-category-label h4{font-size:17px}.observation-pair{grid-template-columns:1fr}.observation-pair figcaption{display:flex;min-height:0}.wrist-crop{max-height:none}.observation-tools>span{font-size:13px}}
 @media(prefers-reduced-motion:reduce){.wrist-coordinate-plane,.wrist-annotation g{transition:none}}
+
+/* Article hierarchy: one serif for reading, one sans serif for controls and data. */
+:root{--type-body:clamp(20px,1.45vw,24px);--type-section:clamp(34px,3.2vw,46px);--type-subsection:clamp(28px,2.3vw,34px);--type-figure:clamp(23px,1.8vw,28px)}
+.opening-overview p,.prose>section>p,.prose .report-score p{font-family:var(--article-serif);font-size:var(--type-body);font-weight:400;line-height:1.65;letter-spacing:-.014em;color:color-mix(in srgb,var(--text) 89%,var(--muted));text-wrap:pretty}
+.opening-overview p,.prose>section>p{margin:0 0 1.3em}
+.prose>section>h2,.prose .method-chapter>.method-group-title,.lab-focus-header h2{font-family:var(--article-serif);font-size:var(--type-section);font-weight:500;line-height:1.16;letter-spacing:-.03em}
+.prose .method-chapter>h3,.prose .shared-score-heading h3{font-family:var(--article-serif);font-size:var(--type-subsection);font-weight:500;line-height:1.2;letter-spacing:-.025em}
+.prose .scene-heading h4,.prose .wrist-study-heading h4{font-family:var(--article-serif);font-size:var(--type-figure);font-weight:500;line-height:1.25;letter-spacing:-.02em}
+.contents a{font-size:16px;line-height:1.4}
+.contents-label{font-size:12px}
+html[data-theme="light"] .contents a{color:#506a7c;border-color:#d6e0e7}
+html[data-theme="light"] .contents a.active{color:#17466a;background:#edf4f8;border-left-color:#4e85a7}
+.observation-pair figcaption{font:500 19px/1.35 var(--article-sans)}
+.prose>section>p.small,.prose .small,.prose figcaption,.context-loop>figcaption{font:400 15px/1.55 var(--article-sans);letter-spacing:0;color:var(--muted)}
+.scene-controls button,.ray-control,.wrist-cue-controls button,.observation-tools button,.grasp-lab .lab-tools button,.lab-focus-controls button{font:500 14px/1.35 var(--article-sans)}
+.prose .paper-reference{font:400 var(--type-body)/1.65 var(--article-serif)}
+.paper-reference cite{font-style:normal;color:var(--text)}
+.paper-reference span{color:var(--muted)}
+.prose .table-scroll-hint{display:none}
+@media(max-width:700px){
+ :root{--type-body:19px;--type-section:32px;--type-subsection:27px;--type-figure:23px}
+ .contents a{font-size:15px}
+ .scene-controls button,.ray-control,.wrist-cue-controls button,.observation-tools button,.grasp-lab .lab-tools button,.lab-focus-controls button{font-size:12px}
+ .prose>section>p.small,.prose .small,.prose figcaption,.context-loop>figcaption{font-size:14px}
+ .observation-pair figcaption{font-size:17px}
+ .prose .table-scroll-hint{display:block;font:400 14px/1.4 var(--article-sans);color:var(--muted);margin:0 0 8px}
+}
