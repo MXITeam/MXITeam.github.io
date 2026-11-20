@@ -1,12 +1,13 @@
-/* MXI identity is carried by one complete project wordmark. */
-.article-head .mxi-title{display:block;text-align:center;font-family:Newsreader,Georgia,serif;font-size:clamp(40px,6vw,80px);font-weight:450;letter-spacing:-.035em;line-height:1.12;margin:38px 0 18px}
-.mxi-team-statement{text-align:center;color:var(--muted);font-size:clamp(15px,1.5vw,19px);line-height:1.5;max-width:660px;margin:0 auto 24px}
-.publication-meta{display:flex;justify-content:center;align-items:center;gap:28px;min-height:45px;margin:0 auto 28px}.publication-meta .paper-slot{display:none}
-.film-links{display:flex;justify-content:flex-end;margin:12px 0 0;font-size:13px;color:var(--muted)}.film-links a:hover{color:var(--text)}
+/* The project name and description form one editorial headline. */
+.hero-title-row{container-type:inline-size;margin:44px 0}
+.article-head .hero-title-row .mxi-title{text-align:center;font-family:var(--article-serif);font-size:clamp(26px,3.85cqw,56px);font-weight:450;letter-spacing:-.035em;line-height:1.16;margin:0;white-space:nowrap;text-wrap:nowrap}
+.mxi-name{white-space:nowrap}
+.film-links{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px 20px;margin:12px 0 0;font-size:13px;color:var(--muted)}.film-links a:hover{color:var(--text)}
 .prose .method-chapter>h3{font-family:inherit;font-size:clamp(25px,2.6vw,34px);font-weight:600;letter-spacing:-.025em;line-height:1.2;margin:0 0 24px;max-width:none}
 .prose .method-chapter>.method-group-title{margin:0 0 40px;font-size:clamp(31px,3.1vw,42px)}
-@media(max-width:600px){.article-head .mxi-title{margin:28px 0 14px}.mxi-team-statement{max-width:340px}.publication-meta{margin-bottom:24px}.opening-overview{padding-top:32px}}
+@media(max-width:900px){.hero-title-row{margin:32px 0}.article-head .hero-title-row .mxi-title{font-size:clamp(30px,5vw,42px);white-space:normal;text-wrap:balance}}
+@media(max-width:600px){.hero-title-row{margin:28px 0}.opening-overview{padding-top:32px}}
 
 .article-head{padding:30px 0 16px}
 
-.article-head .mxi-emphasis{font-weight:610;font-size:1.05em;letter-spacing:-.035em}
+.article-head .mxi-emphasis{font-weight:610;font-size:1em;letter-spacing:inherit}

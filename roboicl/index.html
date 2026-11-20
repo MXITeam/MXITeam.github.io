@@ -11,10 +11,10 @@
 <script src="blog.js?v=16" defer></script>
 <link rel="stylesheet" href="scenes.css">
 <link rel="stylesheet" href="opening.css">
-<link rel="stylesheet" href="editorial.css"><link rel="stylesheet" href="mxi.css?v=9">
-<link rel="stylesheet" href="context-loop.css?v=17"><link rel="stylesheet" href="report.css?v=4"><script type="module" src="report.js?v=3"></script>
+<link rel="stylesheet" href="editorial.css?v=2"><link rel="stylesheet" href="mxi.css?v=11">
+<link rel="stylesheet" href="context-loop.css?v=18"><link rel="stylesheet" href="report.css?v=6"><script type="module" src="report.js?v=3"></script>
 <link rel="preload" href="../assets/fonts/source-serif-4.woff2" as="font" type="font/woff2" crossorigin>
-<script type="module" src="context-loop.js?v=18"></script>
+<script type="module" src="context-loop.js?v=19"></script>
 <script src="opening.js?v=9" defer></script>
 <script type="importmap">{"imports":{"three":"../assets/three/build/three.module.js","three/addons/":"../assets/three/examples/jsm/"}}</script>
 <script type="module" src="scene-loader.js?v=18"></script>
@@ -26,12 +26,11 @@
 
 <nav class="contents" aria-label="Article sections">
 <button class="contents-toggle" aria-expanded="false" aria-controls="section-links">On this page <span aria-hidden="true">＋</span></button>
-<div id="section-links"><span class="contents-label">In this article</span><a href="#showreel">In action</a><a href="#background">Overview</a><a href="#context-loop">Context loop</a><a href="#method">Wrist guides</a><a href="#triangulation">Triangulation</a><a href="#execution">Execution</a><a href="#results">Results</a><a href="#ablation">Ablation</a><a href="#simplicity">Simplicity</a><a href="#next">Outlook</a></div>
+<div id="section-links"><span class="contents-label">In this article</span><a href="#showreel">In action</a><a href="#background">Overview</a><a href="#context-loop">Context loop</a><a href="#method">Wrist guides</a><a href="#triangulation">Triangulation</a><a href="#execution">Execution</a><a href="#results">Results</a><a href="#ablation">Ablation</a><a href="#simplicity">Simplicity</a><a href="#next">Outlook</a><a href="#reference">Reference</a></div>
 </nav>
 <div class="article-head wrap">
 <div class="edition"><span>MXI Research</span><span>November 2026</span></div>
-<h1 class="mxi-title"><span class="mxi-emphasis">MXI</span>-RoboICL</h1><p class="mxi-team-statement">Geometry-aware embodied in-context learning</p>
-<div class="publication-meta"><span class="paper-slot" aria-hidden="true"></span><a href="https://github.com/Embodied-RSI/RoboICL"><span>Original RoboICL</span>GitHub ↗</a></div>
+<div class="hero-title-row"><h1 class="mxi-title"><span class="mxi-name"><span class="mxi-emphasis">MXI</span>-RoboICL:</span> Geometry-aware embodied in-context learning</h1></div>
 </div>
 <section id="showreel" class="showreel wrap" aria-label="MXI-RoboICL in action">
 <figure class="showreel-figure">
@@ -48,16 +47,16 @@
 <p>Across <strong>34 RoboDojo tasks</strong>, MXI-RoboICL achieves a category-balanced score of <strong>75.93</strong>. On the <strong>22 tasks shared with the original RoboICL Report</strong>, it improves the category-balanced score by <strong>28.32 points</strong>. The accompanying studies examine context allocation, geometric consistency, demonstration choice, and sensitivity to scoring-related information. Multi-view localization and route assistance are evaluated as optional extensions to the core policy.</p>
 </section>
 
-<figure id="context-loop" class="context-loop wrap" aria-label="The MXI-RoboICL control loop" data-phase="reference" data-focus="allocation">
+<figure id="context-loop" class="context-loop wrap" aria-label="The MXI-RoboICL control loop" data-phase="reference" data-focus="allocation geometry guides">
   <div class="grasp-lab" aria-label="Interactive diagram of the MXI-RoboICL context loop">
     <div class="lab-focus-header">
       <h2>Geometry in context</h2>
-      <div class="lab-focus-controls" role="group" aria-label="Explore the MXI input designs">
+      <div class="lab-focus-controls" role="group" aria-label="Toggle input details">
         <button type="button" data-lab-focus="allocation" aria-pressed="true">Context allocation</button>
-        <button type="button" data-lab-focus="geometry" aria-pressed="false">Image + pose</button>
-        <button type="button" data-lab-focus="guides" aria-pressed="false">Grasp references</button>
+        <button type="button" data-lab-focus="geometry" aria-pressed="true">Image + pose</button>
+        <button type="button" data-lab-focus="guides" aria-pressed="true">Grasp references</button>
       </div>
-      <p data-lab-focus-description aria-live="polite">More of the same context capacity goes to the demonstration, while recent execution feedback stays available.</p>
+      <p>Expert windows, observation-aligned camera poses, and shared grasp references enter the same context. Toggle the details to explore each input.</p>
     </div>
     <div class="lab-workspace">
       <div class="lab-context">
@@ -160,8 +159,8 @@
       <p><span data-lab-cycle-label>Click a glowing object to explore another grasp.</span></p>
       <div class="lab-tools" role="group" aria-label="Toggle geometric tools"><span>Geometry layers</span>
         <button type="button" data-lab-tool="wrist" aria-pressed="true">Wrist guide</button>
-        <button type="button" data-lab-tool="tri" aria-pressed="false">Triangulation</button>
-        <button type="button" data-lab-tool="plan" aria-pressed="false">Motion check</button>
+        <button type="button" data-lab-tool="tri" aria-pressed="true">Triangulation</button>
+        <button type="button" data-lab-tool="plan" aria-pressed="true">Motion check</button>
       </div>
     </div>
   </div>
@@ -249,20 +248,21 @@
 <div class="shared-score-layout">
 <div class="shared-score-mean"><span>Category-balanced mean</span><div class="shared-score-values"><div><small>Original</small><strong>52.27</strong></div><span aria-hidden="true">→</span><div><small>MXI</small><strong>80.58</strong></div></div><div class="shared-score-gain"><b>+28.32</b><span>points</span></div><p>Higher scores in all three shared categories.</p></div>
 <div class="shared-score-categories"><div class="score-axis" aria-hidden="true"><span>0</span><span>50</span><span>100</span></div><div class="score-category"><div class="score-category-label"><h4>Precision</h4><span>+33.60 points</span></div><div class="score-bar-row original"><span class="sr-only">Original RoboICL</span><div class="score-bar-track" aria-hidden="true"><i style="--score:38.53%"></i></div><b>38.53</b></div><div class="score-bar-row mxi"><span class="sr-only">MXI-RoboICL</span><div class="score-bar-track" aria-hidden="true"><i style="--score:72.13%"></i></div><b>72.13</b></div></div><div class="score-category"><div class="score-category-label"><h4>Long-Horizon</h4><span>+27.37 points</span></div><div class="score-bar-row original"><span class="sr-only">Original RoboICL</span><div class="score-bar-track" aria-hidden="true"><i style="--score:44.11%"></i></div><b>44.11</b></div><div class="score-bar-row mxi"><span class="sr-only">MXI-RoboICL</span><div class="score-bar-track" aria-hidden="true"><i style="--score:71.48%"></i></div><b>71.48</b></div></div><div class="score-category"><div class="score-category-label"><h4>Memory</h4><span>+23.98 points</span></div><div class="score-bar-row original"><span class="sr-only">Original RoboICL</span><div class="score-bar-track" aria-hidden="true"><i style="--score:74.17%"></i></div><b>74.17</b></div><div class="score-bar-row mxi"><span class="sr-only">MXI-RoboICL</span><div class="score-bar-track" aria-hidden="true"><i style="--score:98.15%"></i></div><b>98.15</b></div></div></div></div><figcaption>Each category has equal weight in the shared mean. Gains are calculated before rounding. This compares the complete systems on the common task set.</figcaption></figure>
-<div class="table-scroll"><table class="benchmark-table"><thead><tr><th>Evaluation</th><th>MXI-RoboICL</th><th>Comparison</th><th>Difference</th></tr></thead><tbody>
-<tr><th>22 shared tasks<span class="evaluation-scope">3 categories</span></th><td>80.58</td><td><span class="comparison-name">Original RoboICL</span><span class="comparison-score">52.27</span></td><td>+28.32<sup>1</sup></td></tr>
-<tr><th>34 tasks<span class="evaluation-scope">4 categories</span></th><td>75.93</td><td><span class="comparison-name">Q0-Preview</span><span class="comparison-score">73.20</span></td><td>+2.73</td></tr>
-<tr><th>8 Open tasks<span class="evaluation-scope">Open category</span></th><td>73.13</td><td><span class="comparison-name">Q0-Preview</span><span class="comparison-score">78.20</span></td><td>−5.07</td></tr>
-<tr><th>42 tasks<span class="evaluation-scope">5 categories</span></th><td>75.37</td><td><span class="comparison-name">Q0-Preview</span><span class="comparison-score">74.20</span></td><td>+1.17</td></tr></tbody></table></div>
-<p class="small">¹ The comparison with the original RoboICL Report uses the shared Precision, Long-Horizon, and Memory categories. The 28.32-point difference is calculated before rounding the means.</p>
-<details><summary>Scores by category</summary><div class="table-scroll"><table><thead><tr><th>Category</th><th>MXI-RoboICL</th><th>Q0-Preview</th></tr></thead><tbody>
-<tr><th>Generalization</th><td>61.95</td><td>64.00</td></tr><tr><th>Precision</th><td>72.13</td><td>65.30</td></tr><tr><th>Long-Horizon</th><td>71.48</td><td>69.80</td></tr><tr><th>Memory</th><td>98.15</td><td>93.68</td></tr>
+<p class="table-scroll-hint">Swipe to compare all methods →</p>
+<div class="table-scroll" role="region" aria-label="Benchmark comparisons" tabindex="0"><table class="benchmark-table" aria-describedby="benchmark-notes"><thead><tr><th scope="col">Evaluation</th><th scope="col">MXI-RoboICL</th><th scope="col">Q0-Preview</th><th scope="col">Original RoboICL</th></tr></thead><tbody>
+<tr><th scope="row">22 shared tasks<span class="evaluation-scope">3 categories</span></th><td><span class="comparison-score">80.58</span></td><td><span class="comparison-score">76.26</span><span class="comparison-delta">MXI +4.32 points</span></td><td><span class="comparison-score">52.27</span><span class="comparison-delta">MXI +28.32 points</span></td></tr>
+<tr><th scope="row">34 tasks<span class="evaluation-scope">4 categories</span></th><td><span class="comparison-score">75.93</span></td><td><span class="comparison-score">73.20</span><span class="comparison-delta">MXI +2.73 points</span></td><td><span class="comparison-unreported" aria-label="Not reported">—</span></td></tr>
+<tr><th scope="row">8 Open tasks<span class="evaluation-scope">Open category</span></th><td><span class="comparison-score">73.13</span></td><td><span class="comparison-score">78.20</span><span class="comparison-delta negative">MXI −5.07 points</span></td><td><span class="comparison-unreported" aria-label="Not reported">—</span></td></tr>
+<tr><th scope="row">42 tasks<span class="evaluation-scope">5 categories</span></th><td><span class="comparison-score">75.37</span></td><td><span class="comparison-score">74.20</span><span class="comparison-delta">MXI +1.17 points</span></td><td><span class="comparison-unreported" aria-label="Not reported">—</span></td></tr></tbody></table></div>
+<p class="small" id="benchmark-notes">Each row compares the same task set. The 22-task means use the shared Precision, Long-Horizon, and Memory categories; Q0’s mean is calculated from the category results reported in the paper. Differences are calculated before rounding. — indicates that the original RoboICL report does not cover this evaluation.</p>
+<details><summary>Scores by category</summary><div class="table-scroll"><table><thead><tr><th>Category</th><th class="mxi-score">MXI-RoboICL</th><th>Q0-Preview</th></tr></thead><tbody>
+<tr><th>Generalization</th><td class="mxi-score">61.95</td><td>64.00</td></tr><tr><th>Precision</th><td class="mxi-score">72.13</td><td>65.30</td></tr><tr><th>Long-Horizon</th><td class="mxi-score">71.48</td><td>69.80</td></tr><tr><th>Memory</th><td class="mxi-score">98.15</td><td>93.68</td></tr>
 </tbody></table></div></details>
 <details><summary>Optional route tools: matched pouring layouts</summary><div class="table-scroll"><table><thead><tr><th>Task</th><th>Matched layouts</th><th>Base tools</th><th>With route tools</th></tr></thead><tbody><tr><th>Pour Balls into Vase</th><td>10</td><td>70</td><td>100</td></tr></tbody></table></div><p class="small">Mean task-progress scores on ten matched Pour Balls into Vase layouts, with the same demonstration, prompt, and step budget in both conditions. Route preview and execution are added to the shared base tools.</p></details>
 </section><section id="ablation"><h2>Scoring-related information</h2><p>This study tests sensitivity to scoring-related input. For RoboICL, scoring tiers were removed and any task requirements they contained were restated in natural language. For Q0, the reduction removed numerical completion tolerances, evaluator-derived flags, and selected scene measurements. Both retained task goals and robot calibration, and the evaluator was unchanged.</p>
-<div class="table-scroll"><table><thead><tr><th>Task</th><th>Scenes</th><th>RoboICL<br>original → reduced</th><th>Q0<br>original → reduced</th><th>Difference in score changes</th></tr></thead><tbody><tr><td>Build Tower</td><td>7</td><td>64.3 → 100.0</td><td>67.1 → 58.6</td><td>+44.3</td></tr><tr><td>Fasten Screws</td><td>7</td><td>62.9 → 70.0</td><td>48.6 → 50.0</td><td>+5.7</td></tr><tr><td>Insert Tubes</td><td>6</td><td>76.7 → 80.0</td><td>43.3 → 66.7</td><td>−20.0</td></tr><tr><td>Play Stacking Toy</td><td>3</td><td>30.0 → 26.7</td><td>53.3 → 53.3</td><td>−3.3</td></tr><tr><td>Organize Table</td><td>2</td><td>100.0 → 87.5</td><td>87.5 → 75.0</td><td>0.0</td></tr></tbody></table></div><p class="small">All 25 scenes have scores under both input conditions for both methods. The last column is RoboICL’s score change minus Q0’s, calculated before rounding; positive values favor RoboICL. The results vary by task, and the interventions remove different information, so this is not a matched test of an identical input field.</p></section>
+<div class="table-scroll"><table><thead><tr><th>Task</th><th>Scenes</th><th class="mxi-score">RoboICL<br>original → reduced</th><th>Q0<br>original → reduced</th><th>Difference in score changes</th></tr></thead><tbody><tr><td>Build Tower</td><td>7</td><td class="mxi-score">64.3 → 100.0</td><td>67.1 → 58.6</td><td>+44.3</td></tr><tr><td>Fasten Screws</td><td>7</td><td class="mxi-score">62.9 → 70.0</td><td>48.6 → 50.0</td><td>+5.7</td></tr><tr><td>Insert Tubes</td><td>6</td><td class="mxi-score">76.7 → 80.0</td><td>43.3 → 66.7</td><td>−20.0</td></tr><tr><td>Play Stacking Toy</td><td>3</td><td class="mxi-score">30.0 → 26.7</td><td>53.3 → 53.3</td><td>−3.3</td></tr><tr><td>Organize Table</td><td>2</td><td class="mxi-score">100.0 → 87.5</td><td>87.5 → 75.0</td><td>0.0</td></tr></tbody></table></div><p class="small">All 25 scenes have scores under both input conditions for both methods. The last column is RoboICL’s score change minus Q0’s, calculated before rounding; positive values favor RoboICL. The results vary by task, and the interventions remove different information, so this is not a matched test of an identical input field.</p></section>
 <section id="simplicity"><h2>Compact task specification</h2><div class="report-score"><div><small>Tasks with no additional task note</small><strong>22 / 34</strong></div><p>Across 34 archived task configurations, the median policy specification contains 6,258 characters of shared instructions, tool schemas, and additional task notes. This is 76.3% fewer characters than Q0 and 84.5% fewer than HexaShell in the same audit. Most MXI configurations use the shared specification without an additional task note.</p></div><p>This comparison measures the written policy specification, not the full model input. Runtime requests also include demonstrations, observation history, robot state, and geometry. Three archived requests using 12 demonstration windows and up to 12 online interactions contain 161,162–205,786 text characters. A compact specification therefore does not imply a small runtime context or lower API cost.</p></section>
 <section id="next"><h2>Limitations and outlook</h2><p>Geometric references make the robot’s nominal grasp region explicit, but successful manipulation also depends on target identity, stable contact, object support, and recovery. Recorded failures include a holder being disturbed during a grasp and geometrically consistent estimates on the wrong object. The policy must assess new images and execution receipts after each action chunk to decide whether to continue, correct, or recover.</p></section>
-<section class="references"><h3>Sources and further reading</h3><ol><li><a href="https://github.com/Embodied-RSI/RoboICL">RoboICL source code</a> — implementation and configuration.</li><li><a href="https://robodojo-benchmark.com/">RoboDojo</a> — benchmark and evaluation protocol.</li><li><a href="https://openrua.ai/uni-robot-agent">uni-robot-agent</a> — related work on general-purpose robot agents.</li></ol></section>
+<section class="references" id="reference"><h2>Reference</h2><p class="paper-reference"><cite>MXI-RoboICL.</cite> <span>arXiv preprint, 2026.</span></p><!-- Add the arXiv URL to this citation when the paper is available. --></section>
 </article></div></main><footer class="wrap"><a href="../">MXI: Mathematics × Intelligence</a><span>© 2026 MXI Research</span></footer>
 </body></html>

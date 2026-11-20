@@ -3,7 +3,7 @@ const root=document.querySelector('#context-loop');
 let prepared;
 function prepareResources(){
  return prepared??=Promise.all([
-  import('./grasp-lab-view.js?v=18'),
+  import('./grasp-lab-view.js?v=19'),
   fetch('../assets/arx-x5/grasp-lab.json').then(r=>{if(!r.ok)throw new Error('Trajectories unavailable');return r.json();})
  ]);
 }
@@ -30,7 +30,8 @@ async function boot(root){
   const find=name=>root.querySelector(`[data-lab-${name}]`);
   const windows=[...root.querySelectorAll('[data-lab-window]')];
   const paths=Object.fromEntries([...root.querySelectorAll('[data-lab-path]')].map(p=>[p.dataset.labPath,p]));
-  const workspace=root.querySelector('.lab-workspace'),tools=new Set(['wrist']);
+  const workspace=root.querySelector('.lab-workspace'),tools=new Set(['wrist','tri','plan']);
+  const focuses=new Set(['allocation','geometry','guides']);
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
   const records=new Map(),lengths={};
   let part='pin',layout=1,elapsed=0,last=0,raf=0,visible=false,ready=false;
@@ -189,18 +190,11 @@ async function boot(root){
     find('view-label').textContent=`Current episode · ${data.objects.find(object=>object.id===id).name}`;
     if(ready){prepare();draw();syncPlayback();}
   }
-  const focusDescriptions={
-    allocation:'More of the same context capacity goes to the demonstration, while recent execution feedback stays available.',
-    geometry:'An image travels with its own camera pose and robot state. Earlier observations keep the geometry from when they were captured.',
-    guides:'Demonstration and current wrist views use the same grasp references. Compare the target with the cross and finger-pad guides.'
-  };
   for(const button of root.querySelectorAll('[data-lab-focus]'))button.addEventListener('click',()=>{
-    root.dataset.focus=button.dataset.labFocus;
-    root.querySelectorAll('[data-lab-focus]').forEach(item=>item.setAttribute('aria-pressed',String(item===button)));
-    find('focus-description').textContent=focusDescriptions[root.dataset.focus];
-    if(root.dataset.focus==='guides'){
-      tools.add('wrist');root.querySelector('[data-lab-tool="wrist"]').setAttribute('aria-pressed','true');
-    }
+    const name=button.dataset.labFocus;
+    if(focuses.has(name))focuses.delete(name);else focuses.add(name);
+    root.dataset.focus=[...focuses].join(' ');
+    button.setAttribute('aria-pressed',String(focuses.has(name)));
     endpoints();draw();
   });
   windows.forEach((button,index)=>button.addEventListener('click',()=>{manualWindow=true;displayWindow(index);draw();}));
