@@ -1,0 +1,27 @@
+WEBVTT
+
+00:00:45.790 --> 00:00:50.615
+Here is the same purple pen in the expert demonstration and the
+current episode.
+
+00:00:50.615 --> 00:00:54.940
+MXI projects the grasp center into both wrist views.
+
+00:00:54.940 --> 00:00:57.077
+Now watch the left hand approach.
+
+00:00:57.077 --> 00:00:59.302
+The pen moves toward the cross.
+
+00:00:59.302 --> 00:01:02.902
+The fingers close, and the pen rises with the hand.
+
+00:01:02.902 --> 00:01:08.502
+A shared geometric reference helps the policy relate its own grasp to
+the demonstration.
+
+00:02:11.060 --> 00:02:15.038
+On 22 tasks shared with the original report,
+
+00:02:15.038 --> 00:02:19.830
+the category-balanced score rose from 52.27 to 80.58.
